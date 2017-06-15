@@ -24,7 +24,7 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
@@ -47,7 +47,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewCustomHolder(QBMessageViewHolder holder, CombinationMessage chatMessage, int position) {
-        Log.d(TAG, "onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
+        Log.d(TAG, "onBindViewViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
         FriendsViewHolder friendsViewHolder = (FriendsViewHolder) holder;
 
         boolean friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
@@ -62,7 +62,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
-            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
+            Log.d(TAG, "friendsInfoRequestMessage onBindViewViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
             timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
 
@@ -70,7 +70,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
             lastInfoRequestPosition = position;
         } else {
-            Log.d(TAG, "else onBindViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
+            Log.d(TAG, "else onBindViewViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
             timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
         }
@@ -263,23 +263,23 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     protected static class FriendsViewHolder extends QBMessageViewHolder {
         @Nullable
-        @Bind(R.id.message_textview)
+        @BindView(R.id.message_textview)
         TextView messageTextView;
 
         @Nullable
-        @Bind(R.id.time_text_message_textview)
+        @BindView(R.id.time_text_message_textview)
         TextView timeTextMessageTextView;
 
         @Nullable
-        @Bind(R.id.accept_friend_imagebutton)
+        @BindView(R.id.accept_friend_imagebutton)
         ImageView acceptFriendImageView;
 
         @Nullable
-        @Bind(R.id.divider_view)
+        @BindView(R.id.divider_view)
         View dividerView;
 
         @Nullable
-        @Bind(R.id.reject_friend_imagebutton)
+        @BindView(R.id.reject_friend_imagebutton)
         ImageView rejectFriendImageView;
 
 

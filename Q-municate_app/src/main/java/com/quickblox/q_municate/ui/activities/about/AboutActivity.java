@@ -13,12 +13,12 @@ import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.StringObfuscator;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class AboutActivity extends BaseLoggableActivity {
 
-    @Bind(R.id.app_version_textview)
+    @BindView(R.id.app_version_textview)
     TextView appVersionTextView;
 
     public static void start(Context context) {

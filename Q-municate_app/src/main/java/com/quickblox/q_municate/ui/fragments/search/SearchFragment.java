@@ -20,14 +20,14 @@ import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class SearchFragment extends BaseFragment implements SearchView.OnQueryTextListener, MenuItemCompat.OnActionExpandListener {
 
-    @Bind(R.id.search_viewpager)
+    @BindView(R.id.search_viewpager)
     ViewPager searchViewPager;
 
-    @Bind(R.id.search_radiogroup)
+    @BindView(R.id.search_radiogroup)
     RadioGroup searchRadioGroup;
 
     private SearchViewPagerAdapter searchViewPagerAdapter;

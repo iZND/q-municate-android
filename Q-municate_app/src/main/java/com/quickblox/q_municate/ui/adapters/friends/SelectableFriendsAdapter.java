@@ -15,7 +15,7 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class SelectableFriendsAdapter extends FriendsAdapter {
 
@@ -106,7 +106,7 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
 
     protected static class ViewHolder extends FriendsAdapter.ViewHolder {
 
-        @Bind(R.id.selected_friend_checkbox)
+        @BindView(R.id.selected_friend_checkbox)
         CheckBox selectFriendCheckBox;
 
         public ViewHolder(FriendsAdapter adapter, View view) {

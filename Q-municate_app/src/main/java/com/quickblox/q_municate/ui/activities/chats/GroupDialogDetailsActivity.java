@@ -63,7 +63,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnTextChanged;
 
 public class GroupDialogDetailsActivity extends BaseLoggableActivity implements AdapterView.OnItemClickListener, OnImagePickedListener {
@@ -71,19 +71,19 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     public static final int UPDATE_DIALOG_REQUEST_CODE = 100;
     public static final int RESULT_DELETE_GROUP = 2;
 
-    @Bind(R.id.name_textview)
+    @BindView(R.id.name_textview)
     EditText groupNameEditText;
 
-    @Bind(R.id.occupants_textview)
+    @BindView(R.id.occupants_textview)
     TextView occupantsTextView;
 
-    @Bind(R.id.occupants_listview)
+    @BindView(R.id.occupants_listview)
     ListView occupantsListView;
 
-    @Bind(R.id.online_occupants_textview)
+    @BindView(R.id.online_occupants_textview)
     TextView onlineOccupantsTextView;
 
-    @Bind(R.id.avatar_imageview)
+    @BindView(R.id.avatar_imageview)
     RoundedImageView photoImageView;
 
     private Object actionMode;

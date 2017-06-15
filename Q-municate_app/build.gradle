@@ -1,14 +1,17 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
     }
 
     dependencies {
+        classpath 'com.jakewharton:butterknife-gradle-plugin:8.5.1'
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'io.fabric'
 
 repositories {
@@ -84,20 +87,23 @@ android {
         abortOnError false
     }
 
-    applicationVariants.all { variant ->
+/*    applicationVariants.all { variant ->
         changeApkFileName(variant)
-    }
+    }*/
+
+    flavorDimensions "devEnv"
 
     productFlavors {
 
         dev {
+            dimension "devEnv"
             buildConfigField "String", "APP_ID", devAppID
             buildConfigField "String", "AUTH_KEY", devAuthKey
             buildConfigField "String", "AUTH_SECRET", devAuthSecret
         }
 
         stage {
-
+            dimension "devEnv"
             buildConfigField "String", "APP_ID", stageAppID
             buildConfigField "String", "AUTH_KEY", stageAuthKey
             buildConfigField "String", "AUTH_SECRET", stageAuthSecret
@@ -124,6 +130,11 @@ dependencies {
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.flurry.android:analytics:6.2.0'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:8.5.1"
+
+    annotationProcessor "android.arch.persistence.room:compiler:${rootProject.arch_version}"
+
+
     compile "com.afollestad.material-dialogs:core:${rootProject.materialDialogsVersion}"
 
     compile "com.github.orangegangsters:swipy:${rootProject.swipyRecyclerviewVersion}@aar"
@@ -139,14 +150,15 @@ dependencies {
     compile project(path: ':q-municate_user_service')
     compile project(path: ':q-municate_auth_service')
     compile project(path: ':q-municate_user_cache')
+    compile project(path: ':q-municate-chat_service')
 }
 
-def changeApkFileName(variant) {
+/*def changeApkFileName(variant) {
     variant.outputs.each { output ->
-        def file = output.outputFile
+        def file = output.outputFileName
         def newName = 'QMUN_Android_v.' + rootProject.versionName + '_c.' + rootProject.versionCode + '-' + variant.buildType.name + '.apk'
         output.outputFile = new File(file.parent, newName)
     }
-}
+}*/
 
 apply plugin: 'com.google.gms.google-services'

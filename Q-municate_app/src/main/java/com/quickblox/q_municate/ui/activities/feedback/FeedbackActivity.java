@@ -13,11 +13,11 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class FeedbackActivity extends BaseLoggableActivity {
 
-    @Bind(R.id.feedback_types_radiogroup)
+    @BindView(R.id.feedback_types_radiogroup)
     RadioGroup feedbackTypesRadioGroup;
 
     public static void start(Context context) {

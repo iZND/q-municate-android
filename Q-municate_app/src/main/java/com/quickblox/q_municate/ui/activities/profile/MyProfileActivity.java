@@ -34,7 +34,7 @@ import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import rx.Observable;
@@ -44,13 +44,13 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
 
     private static String TAG = MyProfileActivity.class.getSimpleName();
 
-    @Bind(R.id.photo_imageview)
+    @BindView(R.id.photo_imageview)
     RoundedImageView photoImageView;
 
-    @Bind(R.id.full_name_textinputlayout)
+    @BindView(R.id.full_name_textinputlayout)
     TextInputLayout fullNameTextInputLayout;
 
-    @Bind(R.id.full_name_edittext)
+    @BindView(R.id.full_name_edittext)
     EditText fullNameEditText;
 
     private QBUser qbUser;

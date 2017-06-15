@@ -32,7 +32,7 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import rx.Subscriber;
@@ -41,16 +41,16 @@ public class SettingsActivity extends BaseLoggableActivity {
 
     public static final int REQUEST_CODE_LOGOUT = 300;
 
-    @Bind(R.id.avatar_imageview)
+    @BindView(R.id.avatar_imageview)
     RoundedImageView avatarImageView;
 
-    @Bind(R.id.full_name_edittext)
+    @BindView(R.id.full_name_edittext)
     TextView fullNameTextView;
 
-    @Bind(R.id.push_notification_switch)
+    @BindView(R.id.push_notification_switch)
     SwitchCompat pushNotificationSwitch;
 
-    @Bind(R.id.change_password_view)
+    @BindView(R.id.change_password_view)
     RelativeLayout changePasswordView;
 
     private QMUser user;

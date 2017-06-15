@@ -16,11 +16,11 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public abstract class BaseFriendsListActivity extends BaseLoggableActivity {
 
-    @Bind(R.id.friends_recyclerview)
+    @BindView(R.id.friends_recyclerview)
     protected RecyclerView friendsRecyclerView;
 
     protected FriendsAdapter friendsAdapter;

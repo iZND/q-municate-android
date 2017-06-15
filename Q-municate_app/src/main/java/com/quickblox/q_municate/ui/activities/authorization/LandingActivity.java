@@ -11,15 +11,15 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate_core.models.LoginType;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class LandingActivity extends BaseAuthActivity {
 
-    @Bind(R.id.app_version_textview)
+    @BindView(R.id.app_version_textview)
     TextView appVersionTextView;
 
-    @Bind(R.id.twitter_digits_connect_button)
+    @BindView(R.id.twitter_digits_connect_button)
     Button twitterDigitsConnectButton;
 
     public static void start(Context context) {

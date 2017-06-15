@@ -1,5 +1,6 @@
 package com.quickblox.q_municate;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
@@ -8,11 +9,15 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.digits.sdk.android.Digits;
+import com.example.q_municate_chat_service.QBChatDilogRepository;
+import com.example.q_municate_chat_service.QBChatDilogRepositoryImpl;
+import com.example.q_municate_chat_service.db.QbChatDialogDatabase;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.ServiceZone;
+import com.quickblox.q_municate.di.DependencyModule;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
@@ -36,6 +41,9 @@ public class App extends MultiDexApplication {
     private static App instance;
     private SharedHelper appSharedHelper;
     private SessionListener sessionListener;
+    private QbChatDialogDatabase chatDialgDb;
+    private DependencyModule dependencyModule;
+    private QBChatDilogRepository dilogRepository;
 
 
     public static App getInstance() {
@@ -50,6 +58,9 @@ public class App extends MultiDexApplication {
         initFabric();
         initApplication();
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
+    }
+    public DependencyModule getDependencyModule() {
+        return dependencyModule;
     }
 
     private void initFabric() {
@@ -109,6 +120,11 @@ public class App extends MultiDexApplication {
 
     private void initDb() {
         DataManager.init(this);
+
+        chatDialgDb = Room.
+                databaseBuilder(this, QbChatDialogDatabase.class, "chat_dialog.db").build();
+
+        dilogRepository = new QBChatDilogRepositoryImpl(chatDialgDb.chatDialogDao());
     }
 
     private void initImageLoader(Context context) {
@@ -129,4 +145,11 @@ public class App extends MultiDexApplication {
                 : appSharedHelper;
     }
 
+    public QbChatDialogDatabase getChatDialgDb() {
+        return chatDialgDb;
+    }
+
+    public QBChatDilogRepository getDilogRepository() {
+        return dilogRepository;
+    }
 }

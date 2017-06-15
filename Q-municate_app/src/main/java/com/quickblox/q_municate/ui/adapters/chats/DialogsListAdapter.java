@@ -18,11 +18,11 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import java.util.Iterator;
 import java.util.List;
 
-public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
+public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
 
     private static final String TAG = DialogsListAdapter.class.getSimpleName();
 
-    public DialogsListAdapter(BaseActivity baseActivity, List<DialogWrapper> objectsList) {
+    public DialogsListAdapter(BaseActivity baseActivity, List<QBChatDialog> objectsList) {
         super(baseActivity, objectsList);
     }
 
@@ -30,8 +30,8 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
-        DialogWrapper dialogWrapper = getItem(position);
-        QBChatDialog currentDialog = dialogWrapper.getChatDialog();
+        //QBChatDialog dialogWrapper = getItem(position);
+        QBChatDialog currentDialog = getItem(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_dialog, null);
@@ -50,20 +50,20 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         }
 
         if (QBDialogType.PRIVATE.equals(currentDialog.getType())) {
-            QMUser opponentUser = dialogWrapper.getOpponentUser();
-            if (opponentUser.getFullName() != null) {
-                viewHolder.nameTextView.setText(opponentUser.getFullName());
-                displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
-            } else {
-                viewHolder.nameTextView.setText(resources.getString(R.string.deleted_user));
-            }
+            //QMUser opponentUser = dialogWrapper.getOpponentUser();
+            //if (opponentUser.getFullName() != null) {
+                viewHolder.nameTextView.setText(currentDialog.getName());
+              //  displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
+            //} else {
+//                viewHolder.nameTextView.setText(resources.getString(R.string.deleted_user));
+  //          }
         } else {
             viewHolder.nameTextView.setText(currentDialog.getName());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
             displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
         }
 
-        long totalCount = dialogWrapper.getTotalCount();
+        long totalCount = currentDialog.getUnreadMessageCount();
 
         if (totalCount > ConstsCore.ZERO_INT_VALUE) {
             viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
@@ -72,12 +72,12 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        viewHolder.lastMessageTextView.setText(dialogWrapper.getLastMessage());
+        viewHolder.lastMessageTextView.setText(currentDialog.getLastMessage());
 
         return convertView;
     }
 
-    public void updateItem(DialogWrapper dlgWrapper) {
+   /* public void updateItem(DialogWrapper dlgWrapper) {
         Log.i(TAG, "updateItem = " + dlgWrapper.getChatDialog().getUnreadMessageCount());
         int position = -1;
         for (int i = 0; i < objectsList.size() ; i++) {
@@ -102,14 +102,14 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             objectsList.add(0, dlgWrapper);
             notifyDataSetChanged();
         }
-    }
+    }*/
 
     public void removeItem(String dialogId) {
-        Iterator<DialogWrapper> iterator = objectsList.iterator();
+        Iterator<QBChatDialog> iterator = objectsList.iterator();
 
         while (iterator.hasNext()){
-            DialogWrapper dialogWrapper = iterator.next();
-            if (dialogWrapper.getChatDialog().getDialogId().equals(dialogId)){
+            QBChatDialog dialogWrapper = iterator.next();
+            if (dialogWrapper.getDialogId().equals(dialogId)){
                 iterator.remove();
                 notifyDataSetChanged();
                 break;

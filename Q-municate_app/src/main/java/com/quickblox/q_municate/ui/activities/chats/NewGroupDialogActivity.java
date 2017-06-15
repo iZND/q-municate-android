@@ -18,11 +18,11 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class NewGroupDialogActivity extends BaseFriendsListActivity implements SelectUsersListener {
 
-    @Bind(R.id.members_edittext)
+    @BindView(R.id.members_edittext)
     EditText membersEditText;
 
     public static void start(Context context) {

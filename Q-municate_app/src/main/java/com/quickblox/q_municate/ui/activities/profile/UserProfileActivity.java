@@ -41,24 +41,24 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class UserProfileActivity extends BaseLoggableActivity {
 
-    @Bind(R.id.avatar_imageview)
+    @BindView(R.id.avatar_imageview)
     RoundedImageView avatarImageView;
 
-    @Bind(R.id.name_textview)
+    @BindView(R.id.name_textview)
     TextView nameTextView;
 
-    @Bind(R.id.timestamp_textview)
+    @BindView(R.id.timestamp_textview)
     TextView timestampTextView;
 
-    @Bind(R.id.phone_view)
+    @BindView(R.id.phone_view)
     View phoneView;
 
-    @Bind(R.id.phone_textview)
+    @BindView(R.id.phone_textview)
     TextView phoneTextView;
 
     private DataManager dataManager;

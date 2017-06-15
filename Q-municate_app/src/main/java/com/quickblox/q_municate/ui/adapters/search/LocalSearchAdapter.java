@@ -33,7 +33,7 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class LocalSearchAdapter extends BaseFilterAdapter<DialogSearchWrapper, BaseClickListenerViewHolder<DialogSearchWrapper>> {
 
@@ -107,13 +107,13 @@ public class LocalSearchAdapter extends BaseFilterAdapter<DialogSearchWrapper, B
 
     protected static class ViewHolder extends BaseViewHolder<DialogSearchWrapper> {
 
-        @Bind(R.id.avatar_imageview)
+        @BindView(R.id.avatar_imageview)
         RoundedImageView avatarImageView;
 
-        @Bind(R.id.title_textview)
+        @BindView(R.id.title_textview)
         TextView titleTextView;
 
-        @Bind(R.id.label_textview)
+        @BindView(R.id.label_textview)
         TextView labelTextView;
 
         public ViewHolder(LocalSearchAdapter adapter, View view) {

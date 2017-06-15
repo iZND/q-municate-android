@@ -49,7 +49,7 @@ import java.util.Observer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnTouch;
 
 public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWrapper>> implements SearchListener {
@@ -57,7 +57,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
     private final static int LOADER_ID = LocalSearchFragment.class.hashCode();
     private static final String TAG = LocalSearchFragment.class.getSimpleName();
 
-    @Bind(R.id.dialogs_recyclerview)
+    @BindView(R.id.dialogs_recyclerview)
     RecyclerView dialogsRecyclerView;
 
     private DataManager dataManager;

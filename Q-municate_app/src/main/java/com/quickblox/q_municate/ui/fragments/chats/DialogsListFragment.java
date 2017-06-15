@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.fragments.chats;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,9 +20,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.q_municate_chat_service.QBChatDialogModel;
+import com.example.q_municate_chat_service.viewmodel.QbChatDialogListViewModel;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.loaders.DialogsListLoader;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -69,7 +73,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
@@ -82,10 +86,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private static final String TAG = DialogsListFragment.class.getSimpleName();
     private static final int LOADER_ID = DialogsListFragment.class.hashCode();
 
-    @Bind(R.id.chats_listview)
+    @BindView(R.id.chats_listview)
     ListView dialogsListView;
 
-    @Bind(R.id.empty_list_textview)
+    @BindView(R.id.empty_list_textview)
     TextView emptyListTextView;
 
     private DialogsListAdapter dialogsListAdapter;
@@ -183,7 +187,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         super.onCreateContextMenu(menu, view, menuInfo);
         MenuInflater menuInflater = baseActivity.getMenuInflater();
         AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getChatDialog();
+        QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
         if(chatDialog.getType().equals(QBDialogType.GROUP)){
             menuInflater.inflate(R.menu.dialogs_list_group_ctx_menu, menu);
         } else{
@@ -197,7 +201,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         switch (item.getItemId()) {
             case R.id.action_delete:
                 if (baseActivity.checkNetworkAvailableWithError() && checkDialogsLoadFinished()) {
-                    QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getChatDialog();
+                    QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
                     deleteDialog(chatDialog);
                 }
                 break;
@@ -209,8 +213,25 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
-        initDataLoader(LOADER_ID);
+
+        QbChatDialogListViewModel.Factory factory = new QbChatDialogListViewModel.Factory(App.getInstance().getDilogRepository());
+        QbChatDialogListViewModel qbChatDialogListViewModel =
+                ViewModelProviders.of(this, factory).get(QbChatDialogListViewModel.class);
+
+        setupChanges(qbChatDialogListViewModel);
+        //initDataLoader(LOADER_ID);
+
     }
+
+    private void setupChanges(QbChatDialogListViewModel chatDialogListViewModel){
+        chatDialogListViewModel.getDialogs().observe(this, new android.arch.lifecycle.Observer<List<QBChatDialog>>() {
+            @Override
+            public void onChanged(@Nullable List<QBChatDialog> qbChatDialogs) {
+                dialogsListAdapter.setNewData(qbChatDialogs);
+            }
+        });
+    }
+
 
     @Override
     public void onResume() {
@@ -222,8 +243,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (dialogsListAdapter != null) {
             dialogsListAdapter.notifyDataSetChanged();
         }
-        checkLoaderConsumerQueue();
-        checkUpdateDialogs();
+
+        //checkLoaderConsumerQueue();
+        //checkUpdateDialogs();
     }
 
     private void checkUpdateDialogs() {
@@ -312,10 +334,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
         Log.i(TAG, "updateOrAddDialog dialogWrapper= " + dialogWrapper.getTotalCount());
-        dialogsListAdapter.updateItem(dialogWrapper);
+        //dialogsListAdapter.updateItem(dialogWrapper);
 
         if(updatePosition) {
-            dialogsListAdapter.updateItemPosition(dialogWrapper);
+            //dialogsListAdapter.updateItemPosition(dialogWrapper);
         }
 
         int start = dialogsListView.getFirstVisiblePosition();
@@ -331,7 +353,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @OnItemClick(R.id.chats_listview)
     void startChat(int position) {
-        QBChatDialog chatDialog = dialogsListAdapter.getItem(position).getChatDialog();
+        QBChatDialog chatDialog = dialogsListAdapter.getItem(position);
 
         if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpeningDialog(chatDialog.getDialogId())) {
             return;
@@ -390,9 +412,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     private void updateDialogsAdapter(List<DialogWrapper> dialogsList) {
         if (dialogsListLoader.isLoadAll()) {
-            dialogsListAdapter.setNewData(dialogsList);
+            dialogsListAdapter.setNewData(null);
         } else {
-            dialogsListAdapter.addNewData((ArrayList<DialogWrapper>) dialogsList);
+            dialogsListAdapter.addNewData(null);
         }
 
         if(dialogsListLoader.isLoadRestFinished()) {
@@ -459,7 +481,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void initChatsDialogs() {
-        List<DialogWrapper> dialogsList = new ArrayList<>();
+        List<QBChatDialog> dialogsList = new ArrayList<>();
         dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
     }
 

@@ -35,20 +35,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class CreateGroupDialogActivity extends BaseFriendsListActivity implements OnImagePickedListener {
 
     private static final String EXTRA_FRIENDS_LIST = "friends_list";
 
-    @Bind(R.id.photo_imageview)
+    @BindView(R.id.photo_imageview)
     RoundedImageView photoImageView;
 
-    @Bind(R.id.group_name_edittext)
+    @BindView(R.id.group_name_edittext)
     EditText groupNameEditText;
 
-    @Bind(R.id.participants_count_textview)
+    @BindView(R.id.participants_count_textview)
     TextView participantsCountTextView;
 
     private QBFile qbFile;

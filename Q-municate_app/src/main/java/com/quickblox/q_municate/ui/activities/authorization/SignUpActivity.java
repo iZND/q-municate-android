@@ -37,7 +37,7 @@ import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import rx.Subscriber;
@@ -46,13 +46,13 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
 
     private static final String FULL_NAME_BLOCKED_CHARACTERS = "<>;";
 
-    @Bind(R.id.full_name_textinputlayout)
+    @BindView(R.id.full_name_textinputlayout)
     TextInputLayout fullNameInputLayout;
 
-    @Bind(R.id.full_name_edittext)
+    @BindView(R.id.full_name_edittext)
     EditText fullNameEditText;
 
-    @Bind(R.id.avatar_imageview)
+    @BindView(R.id.avatar_imageview)
     RoundedImageView avatarImageView;
 
     private boolean isNeedUpdateImage;

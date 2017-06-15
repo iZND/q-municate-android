@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.ui.fragments.base;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,7 +24,7 @@ import com.quickblox.q_municate_core.service.QBService;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseFragment extends Fragment implements UserStatusChangingListener, ServiceConnectionListener {
+public abstract class BaseFragment extends LifecycleFragment implements UserStatusChangingListener, ServiceConnectionListener {
 
     protected App app;
     protected BaseActivity baseActivity;

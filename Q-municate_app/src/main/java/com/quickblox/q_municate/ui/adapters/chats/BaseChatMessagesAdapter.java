@@ -33,7 +33,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -209,23 +209,23 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
 
     protected static class RequestsViewHolder extends QBMessageViewHolder {
         @Nullable
-        @Bind(R.id.message_textview)
+        @BindView(R.id.message_textview)
         TextView messageTextView;
 
         @Nullable
-        @Bind(R.id.time_text_message_textview)
+        @BindView(R.id.time_text_message_textview)
         TextView timeTextMessageTextView;
 
         @Nullable
-        @Bind(R.id.accept_friend_imagebutton)
+        @BindView(R.id.accept_friend_imagebutton)
         ImageView acceptFriendImageView;
 
         @Nullable
-        @Bind(R.id.divider_view)
+        @BindView(R.id.divider_view)
         View dividerView;
 
         @Nullable
-        @Bind(R.id.reject_friend_imagebutton)
+        @BindView(R.id.reject_friend_imagebutton)
         ImageView rejectFriendImageView;
 
 

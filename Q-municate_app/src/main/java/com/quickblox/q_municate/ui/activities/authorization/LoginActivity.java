@@ -17,13 +17,13 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 public class LoginActivity extends BaseAuthActivity {
 
-    @Bind(R.id.remember_me_switch)
+    @BindView(R.id.remember_me_switch)
     SwitchCompat rememberMeSwitch;
 
     public static void start(Context context) {

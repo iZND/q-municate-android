@@ -42,7 +42,7 @@ import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class MapsActivity extends BaseLoggableActivity
@@ -76,10 +76,10 @@ public class MapsActivity extends BaseLoggableActivity
         context.startActivity(intent);
     }
 
-    @Bind(R.id.map_textview)
+    @BindView(R.id.map_textview)
     TextView sendTextView;
 
-    @Bind(R.id.map_framelayout)
+    @BindView(R.id.map_framelayout)
     FrameLayout sendLocationPanel;
 
     @OnClick(R.id.map_framelayout)

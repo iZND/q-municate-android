@@ -23,22 +23,22 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnTextChanged;
 import rx.Subscriber;
 
 public class ChangePasswordActivity extends BaseLoggableActivity {
 
-    @Bind(R.id.old_password_textinputlayout)
+    @BindView(R.id.old_password_textinputlayout)
     TextInputLayout oldPasswordTextInputLayout;
 
-    @Bind(R.id.old_password_edittext)
+    @BindView(R.id.old_password_edittext)
     EditText oldPasswordEditText;
 
-    @Bind(R.id.new_password_textinputlayout)
+    @BindView(R.id.new_password_textinputlayout)
     TextInputLayout newPasswordTextInputLayout;
 
-    @Bind(R.id.new_password_edittext)
+    @BindView(R.id.new_password_edittext)
     EditText newPasswordEditText;
 
     private QBUser qbUser;

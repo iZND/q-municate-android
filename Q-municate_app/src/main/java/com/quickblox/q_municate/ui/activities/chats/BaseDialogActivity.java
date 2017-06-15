@@ -84,7 +84,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import butterknife.OnTouch;
@@ -102,22 +102,22 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
-    @Bind(R.id.messages_swiperefreshlayout)
+    @BindView(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
 
-    @Bind(R.id.messages_recycleview)
+    @BindView(R.id.messages_recycleview)
     RecyclerView messagesRecyclerView;
 
-    @Bind(R.id.message_edittext)
+    @BindView(R.id.message_edittext)
     EditText messageEditText;
 
-    @Bind(R.id.attach_button)
+    @BindView(R.id.attach_button)
     ImageButton attachButton;
 
-    @Bind(R.id.send_button)
+    @BindView(R.id.send_button)
     ImageButton sendButton;
 
-    @Bind(R.id.smile_panel_imagebutton)
+    @BindView(R.id.smile_panel_imagebutton)
     ImageButton smilePanelImageButton;
 
     protected QBChatDialog currentChatDialog;

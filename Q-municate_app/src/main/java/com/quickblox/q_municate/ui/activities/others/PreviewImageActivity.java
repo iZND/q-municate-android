@@ -11,7 +11,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.views.TouchImageView;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class PreviewImageActivity extends BaseLoggableActivity {
 
@@ -19,7 +19,7 @@ public class PreviewImageActivity extends BaseLoggableActivity {
 
     private static final int IMAGE_MAX_ZOOM = 4;
 
-    @Bind(R.id.image_touchimageview)
+    @BindView(R.id.image_touchimageview)
     TouchImageView imageTouchImageView;
 
     public static void start(Context context, String url) {

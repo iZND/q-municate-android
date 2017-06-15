@@ -28,7 +28,7 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickListenerViewHolder<QBUser>> {
 
@@ -150,16 +150,16 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickList
 
     protected static class ViewHolder extends BaseViewHolder<QBUser> {
 
-        @Bind(R.id.avatar_imageview)
+        @BindView(R.id.avatar_imageview)
         RoundedImageView avatarImageView;
 
-        @Bind(R.id.name_textview)
+        @BindView(R.id.name_textview)
         TextView fullNameTextView;
 
-        @Bind(R.id.status_textview)
+        @BindView(R.id.status_textview)
         TextView statusTextView;
 
-        @Bind(R.id.add_friend_imagebutton)
+        @BindView(R.id.add_friend_imagebutton)
         ImageView addFriendImageView;
 
         public ViewHolder(GlobalSearchAdapter adapter, View view) {

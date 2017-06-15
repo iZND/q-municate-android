@@ -57,7 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class CallActivity extends BaseLoggableActivity implements QBRTCClientSessionCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback {
 
@@ -66,7 +66,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    @Bind(R.id.timer_chronometer)
+    @BindView(R.id.timer_chronometer)
     Chronometer timerChronometer;
 
     private QBRTCTypes.QBConferenceType qbConferenceType;

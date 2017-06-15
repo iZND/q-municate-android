@@ -37,8 +37,9 @@ import com.twitter.sdk.android.core.TwitterCore;
 
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnTextChanged;
+import butterknife.Optional;
 import rx.Observer;
 
 public abstract class BaseAuthActivity extends BaseActivity {
@@ -48,19 +49,19 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected static final String STARTED_LOGIN_TYPE = "started_login_type";
 
     @Nullable
-    @Bind(R.id.email_textinputlayout)
+    @BindView(R.id.email_textinputlayout)
     protected TextInputLayout emailTextInputLayout;
 
     @Nullable
-    @Bind(R.id.email_edittext)
+    @BindView(R.id.email_edittext)
     protected EditText emailEditText;
 
     @Nullable
-    @Bind(R.id.password_textinputlayout)
+    @BindView(R.id.password_textinputlayout)
     protected TextInputLayout passwordTextInputLayout;
 
     @Nullable
-    @Bind(R.id.password_edittext)
+    @BindView(R.id.password_edittext)
     protected EditText passwordEditText;
 
     protected FacebookHelper facebookHelper;
@@ -107,13 +108,13 @@ public abstract class BaseAuthActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Nullable
+    @Optional
     @OnTextChanged(R.id.email_edittext)
     void onTextChangedEmail(CharSequence text) {
         emailTextInputLayout.setError(null);
     }
 
-    @Nullable
+    @Optional
     @OnTextChanged(R.id.password_edittext)
     void onTextChangedPassword(CharSequence text) {
         passwordTextInputLayout.setError(null);

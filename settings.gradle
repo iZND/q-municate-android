@@ -1,4 +1,4 @@
-include ':Q-municate_app',
+include ':Q-municate_app', ':q-municate_contactlist_service', ':q-municate-chat_service',
         ':q-municate_auth_service',
         ':q-municate_user_service',
         ':q-municate_user_cache',

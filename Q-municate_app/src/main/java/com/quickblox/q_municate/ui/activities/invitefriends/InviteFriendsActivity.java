@@ -25,11 +25,11 @@ import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class InviteFriendsActivity extends BaseLoggableActivity implements CounterChangedListener {
 
-    @Bind(R.id.friends_listview)
+    @BindView(R.id.friends_listview)
     ListView friendsListView;
 
     private List<InviteFriend> friendsContactsList;

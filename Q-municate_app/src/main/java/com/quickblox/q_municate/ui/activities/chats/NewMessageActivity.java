@@ -32,11 +32,11 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class NewMessageActivity extends BaseLoggableActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
-    @Bind(R.id.friends_recyclerview)
+    @BindView(R.id.friends_recyclerview)
     RecyclerView friendsRecyclerView;
 
     private DataManager dataManager;

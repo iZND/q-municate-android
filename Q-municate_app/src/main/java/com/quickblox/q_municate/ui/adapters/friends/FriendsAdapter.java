@@ -21,7 +21,7 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class FriendsAdapter extends BaseFilterAdapter<QMUser, BaseClickListenerViewHolder<QMUser>> {
 
@@ -123,16 +123,16 @@ public class FriendsAdapter extends BaseFilterAdapter<QMUser, BaseClickListenerV
 
     protected static class ViewHolder extends BaseViewHolder<QMUser> {
 
-        @Bind(R.id.first_latter_textview)
+        @BindView(R.id.first_latter_textview)
         TextView firstLatterTextView;
 
-        @Bind(R.id.avatar_imageview)
+        @BindView(R.id.avatar_imageview)
         RoundedImageView avatarImageView;
 
-        @Bind(R.id.name_textview)
+        @BindView(R.id.name_textview)
         TextView nameTextView;
 
-        @Bind(R.id.label_textview)
+        @BindView(R.id.label_textview)
         TextView labelTextView;
 
         public ViewHolder(FriendsAdapter adapter, View view) {

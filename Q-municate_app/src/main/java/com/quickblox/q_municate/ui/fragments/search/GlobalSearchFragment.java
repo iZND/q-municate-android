@@ -43,7 +43,7 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnTouch;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -54,10 +54,10 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     private static final int SEARCH_DELAY = 1000;
     private static final int MIN_VALUE_FOR_SEARCH = 3;
 
-    @Bind(R.id.contacts_swipyrefreshlayout)
+    @BindView(R.id.contacts_swipyrefreshlayout)
     SwipyRefreshLayout swipyRefreshLayout;
 
-    @Bind(R.id.contacts_recyclerview)
+    @BindView(R.id.contacts_recyclerview)
     RecyclerView contactsRecyclerView;
 
     private Timer searchTimer;

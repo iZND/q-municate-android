@@ -8,11 +8,11 @@ import android.webkit.WebView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class UserAgreementActivity extends BaseLoggableActivity {
 
-    @Bind(R.id.user_agreement_webview)
+    @BindView(R.id.user_agreement_webview)
     WebView userAgreementWebView;
 
     public static void start(Context context) {

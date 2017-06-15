@@ -18,16 +18,16 @@ import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnTextChanged;
 import rx.Subscriber;
 
 public class ForgotPasswordActivity extends BaseActivity {
 
-    @Bind(R.id.email_textinputlayout)
+    @BindView(R.id.email_textinputlayout)
     TextInputLayout emailTextInputLayout;
 
-    @Bind(R.id.email_edittext)
+    @BindView(R.id.email_edittext)
     EditText emailEditText;
 
     public static void start(Context context) {
