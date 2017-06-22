@@ -20,8 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.q_municate_chat_service.QBChatDialogModel;
-import com.example.q_municate_chat_service.viewmodel.QbChatDialogListViewModel;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.helper.CollectionsUtil;
@@ -36,13 +34,13 @@ import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
 import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
+import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogWrapper;
-import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
@@ -78,7 +76,7 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 
-public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
+public class DialogsListFragment extends BaseFragment {
 
     public static final int PICK_DIALOG = 100;
     public static final int CREATE_DIALOG = 200;
@@ -97,12 +95,12 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private QBUser qbUser;
     private Observer commonObserver;
     private DialogsListLoader dialogsListLoader;
-    private Queue<LoaderConsumer> loaderConsumerQueue = new ConcurrentLinkedQueue<>();
 
     Set<String> dialogsIdsToUpdate;
 
     protected Handler handler = new Handler();
     private State updateDialogsProcess;
+    private QbChatDialogListViewModel qbChatDialogListViewModel;
 
     enum State {started, stopped, finished}
 
@@ -188,7 +186,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         MenuInflater menuInflater = baseActivity.getMenuInflater();
         AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
         QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
-        if(chatDialog.getType().equals(QBDialogType.GROUP)){
+        if(chatDialog.getDialogType().equals(QBDialogType.GROUP)){
             menuInflater.inflate(R.menu.dialogs_list_group_ctx_menu, menu);
         } else{
             menuInflater.inflate(R.menu.dialogs_list_private_ctx_menu, menu);
@@ -200,10 +198,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.action_delete:
-                if (baseActivity.checkNetworkAvailableWithError() && checkDialogsLoadFinished()) {
                     QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
                     deleteDialog(chatDialog);
-                }
                 break;
         }
         return true;
@@ -214,12 +210,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
 
-        QbChatDialogListViewModel.Factory factory = new QbChatDialogListViewModel.Factory(App.getInstance().getDilogRepository());
-        QbChatDialogListViewModel qbChatDialogListViewModel =
+        QbChatDialogListViewModel.Factory factory = new QbChatDialogListViewModel.Factory();
+        qbChatDialogListViewModel =
                 ViewModelProviders.of(this, factory).get(QbChatDialogListViewModel.class);
 
         setupChanges(qbChatDialogListViewModel);
-        //initDataLoader(LOADER_ID);
 
     }
 
@@ -227,7 +222,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         chatDialogListViewModel.getDialogs().observe(this, new android.arch.lifecycle.Observer<List<QBChatDialog>>() {
             @Override
             public void onChanged(@Nullable List<QBChatDialog> qbChatDialogs) {
+                Log.i(TAG, "onChanged live data");
                 dialogsListAdapter.setNewData(qbChatDialogs);
+                checkEmptyList(dialogsListAdapter.getCount());
+                baseActivity.hideProgress();
+                baseActivity.hideSnackBar(R.string.dialog_loading_dialogs);
             }
         });
     }
@@ -244,25 +243,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             dialogsListAdapter.notifyDataSetChanged();
         }
 
-        //checkLoaderConsumerQueue();
-        //checkUpdateDialogs();
     }
 
-    private void checkUpdateDialogs() {
-//        check if needs update dialog list
-        if(!CollectionsUtil.isEmpty(dialogsIdsToUpdate)) {
-            QBLoadDialogByIdsCommand.start(getContext(), new ArrayList<>(dialogsIdsToUpdate));
-            dialogsIdsToUpdate.clear();
-        }
-    }
 
-    private void checkLoaderConsumerQueue() {
-//        check if the update process can be proceeded
-        if(State.stopped == updateDialogsProcess) {
-            Log.d(TAG, "checkLoaderConsumerQueue proceeded updateDialogsListFromQueue");
-            updateDialogsListFromQueue();
-        }
-    }
 
     @Override
     public void onPause() {
@@ -297,9 +280,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (PICK_DIALOG == requestCode && data != null) {
             String dialogId = data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
             checkDialogsIds(dialogId);
-            updateOrAddDialog(dialogId, data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
+            //updateOrAddDialog(dialogId, data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
         } else if (CREATE_DIALOG == requestCode && data != null) {
-            updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), true);
+            //updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), true);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -308,14 +291,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if(updateDialogsProcess != State.finished) {
             updateDialogsProcess = State.stopped;
         }
-    }
-
-    private boolean checkDialogsLoadFinished() {
-        if (updateDialogsProcess != State.finished) {
-            ToastUtils.shortToast(R.string.chat_service_is_initializing);
-            return false;
-        }
-        return true;
     }
 
     private void checkDialogsIds(String dialogId) {
@@ -359,7 +334,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             return;
         }
 
-        if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+        if (QBDialogType.PRIVATE.equals(chatDialog.getDialogType())) {
             startPrivateChatActivity(chatDialog);
         } else {
             startGroupChatActivity(chatDialog);
@@ -384,31 +359,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
     }
 
-    @Override
-    protected Loader<List<DialogWrapper>> createDataLoader() {
-        dialogsListLoader = new DialogsListLoader(getActivity(), dataManager);
-        return dialogsListLoader;
-    }
 
-    @Override
-    public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
-        updateDialogsProcess = State.started;
-        Log.d(TAG, "onLoadFinished!!! dialogsListLoader.isLoadCacheFinished() " + dialogsListLoader.isLoadCacheFinished());
-        updateDialogsListFromQueue();
-
-        updateDialogsAdapter(dialogsList);
-
-        checkEmptyList(dialogsListAdapter.getCount());
-
-        if (!baseActivity.isDialogLoading()) {
-            baseActivity.hideSnackBar(R.string.dialog_loading_dialogs);
-        }
-
-//        startForResult load dialogs from REST when finished loading from cache
-        if (dialogsListLoader.isLoadCacheFinished()) {
-            QBLoadDialogsCommand.start(getContext(), true);
-        }
-    }
 
     private void updateDialogsAdapter(List<DialogWrapper> dialogsList) {
         if (dialogsListLoader.isLoadAll()) {
@@ -473,8 +424,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void addActions() {
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteDialogSuccessAction());
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, new LoadChatsFailedAction());
         baseActivity.addAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, new UpdateDialogSuccessAction());
 
         baseActivity.updateBroadcastActionList();
@@ -488,6 +437,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void startPrivateChatActivity(QBChatDialog chatDialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(chatDialog.getDialogId());
+        List<Integer> occupants = chatDialog.getOccupants();
+        occupants.remove(AppSession.getSession().getUser().getId());
         QMUser opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
 
         if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
@@ -499,90 +450,15 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         GroupDialogActivity.startForResult(this, chatDialog, PICK_DIALOG);
     }
 
-    private void updateDialogsList(int startRow, int perPage) {
-//        logic for correct behavior of pagination loading dialogs
-//        we can't fire onChangedData until we have incomplete loader task in queue
-        if (!loaderConsumerQueue.isEmpty()) {
-            Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
-            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
-            return;
-        }
-
-//        if Loader is in loading process, we don't fire onChangedData, cause we do not want interrupt current load task
-        if (dialogsListLoader.isLoading) {
-            Log.d(TAG, "updateDialogsList dialogsListLoader.isLoading");
-            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
-        } else {
-//        we don't have tasks in queue, so load dialogs by pages
-            if(!isResumed()) {
-                loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
-            } else {
-                Log.d(TAG, "updateDialogsList onChangedData");
-                dialogsListLoader.setPagination(startRow, perPage);
-                onChangedData();
-            }
-        }
-    }
-
-    private void updateDialogsList() {
-        if(!loaderConsumerQueue.isEmpty()){
-            Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
-            loaderConsumerQueue.offer(new LoaderConsumer(true));
-            return;
-        }
-
-        if(dialogsListLoader.isLoading) {
-            Log.d(TAG, "updateDialogsList dialogsListLoader.isLoading");
-            loaderConsumerQueue.offer(new LoaderConsumer(true));
-        } else {
-//        load All dialogs
-            if(!isResumed()) {
-                Log.d(TAG, "updateDialogsList !isResumed() offer");
-                loaderConsumerQueue.offer(new LoaderConsumer(true));
-            } else {
-                dialogsListLoader.setLoadAll(true);
-                onChangedData();
-            }
-        }
-    }
-
-    private void updateDialogsListFromQueue() {
-        if(!loaderConsumerQueue.isEmpty()) {
-            LoaderConsumer consumer = loaderConsumerQueue.poll();
-            handler.post(consumer);
-        }
-    }
-
-    private class LoaderConsumer implements Runnable {
-        boolean loadAll;
-        int startRow;
-        int perPage;
-
-        LoaderConsumer(boolean loadAll) {
-            this.loadAll = loadAll;
-        }
-
-        LoaderConsumer(int startRow, int perPage) {
-            this.startRow = startRow;
-            this.perPage = perPage;
-        }
-
-        @Override
-        public void run() {
-            Log.d(TAG, "LoaderConsumer onChangedData");
-            dialogsListLoader.setLoadAll(loadAll);
-            dialogsListLoader.setPagination(startRow, perPage);
-            onChangedData();
-        }
-    }
-
     private void deleteDialog(QBChatDialog chatDialog) {
         if(chatDialog == null || chatDialog.getDialogId() == null){
             return;
         }
 
+        qbChatDialogListViewModel.removeDialog(chatDialog);
         baseActivity.showProgress();
-        QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId(), chatDialog.getType().getCode());
+
+        //QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId(), chatDialog.getType().getCode());
     }
 
     private void checkEmptyList(int listSize) {
@@ -622,34 +498,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
     }
 
-    private class LoadChatsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Log.d(TAG, "LoadChatsSuccessAction bundle= " + bundle);
-            if(bundle != null) {
-                if (isLoadPerPage(bundle)) {
-                    updateDialogsList(bundle.getInt(ConstsCore.DIALOGS_START_ROW), bundle.getInt(ConstsCore.DIALOGS_PER_PAGE));
-                } else if(bundle.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL)) {
-                    updateDialogsList();
-                }
-            }
-        }
-
-        private boolean isLoadPerPage(Bundle bundle) {
-            return bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null;
-        }
-    }
-
-    private class LoadChatsFailedAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            Log.d(TAG, "LoadChatsFailedAction bundle= " + bundle);
-            updateDialogsProcess = State.finished;
-        }
-    }
-
     private class UpdateDialogSuccessAction implements Command {
 
         @Override
@@ -678,7 +526,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                             boolean updatePosition = message.isIncoming(AppSession.getSession().getUser().getId());
                             Log.i(TAG, "CommonObserver getMessageDataManager updatePosition= " + updatePosition);
 
-                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId(), updatePosition);
+//                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId(), updatePosition);
                         }
                     }
                     else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
@@ -688,7 +536,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                         }
                         Dialog dialog = getObjFromBundle((Bundle) data);
                         if (dialog != null) {
-                            updateOrAddDialog(dialog.getDialogId(), true);
+                        //    updateOrAddDialog(dialog.getDialogId(), true);
                         }
                     } else if (observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                         DialogOccupant dialogOccupant = getObjFromBundle((Bundle) data);

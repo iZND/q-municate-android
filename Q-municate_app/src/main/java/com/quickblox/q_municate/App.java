@@ -10,14 +10,19 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.digits.sdk.android.Digits;
 import com.example.q_municate_chat_service.QBChatDilogRepository;
-import com.example.q_municate_chat_service.QBChatDilogRepositoryImpl;
 import com.example.q_municate_chat_service.db.QbChatDialogDatabase;
+import com.example.q_municate_chat_service.entity.ContactItem;
+import com.example.q_municate_chat_service.repository.BaseRepo;
+import com.example.q_municate_chat_service.repository.ContactListRepo;
+import com.example.q_municate_chat_service.repository.ContactListRepoImpl;
+import com.quickblox.q_municate.di.ChatDialogModule;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.ServiceZone;
-import com.quickblox.q_municate.di.DependencyModule;
+import com.quickblox.q_municate.di.DIComponent;
+import com.quickblox.q_municate.di.DaggerDIComponent;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
@@ -42,8 +47,9 @@ public class App extends MultiDexApplication {
     private SharedHelper appSharedHelper;
     private SessionListener sessionListener;
     private QbChatDialogDatabase chatDialgDb;
-    private DependencyModule dependencyModule;
     private QBChatDilogRepository dilogRepository;
+    private DIComponent diComponent;
+    private ContactListRepoImpl contactListRepo;
 
 
     public static App getInstance() {
@@ -58,9 +64,6 @@ public class App extends MultiDexApplication {
         initFabric();
         initApplication();
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
-    }
-    public DependencyModule getDependencyModule() {
-        return dependencyModule;
     }
 
     private void initFabric() {
@@ -124,7 +127,25 @@ public class App extends MultiDexApplication {
         chatDialgDb = Room.
                 databaseBuilder(this, QbChatDialogDatabase.class, "chat_dialog.db").build();
 
-        dilogRepository = new QBChatDilogRepositoryImpl(chatDialgDb.chatDialogDao());
+        diComponent = buildComponent(chatDialgDb);
+
+    }
+
+    protected DIComponent buildComponent(QbChatDialogDatabase chatDialgDb) {
+        return DaggerDIComponent.builder()
+                .chatDialogModule(new ChatDialogModule(chatDialgDb))
+                .build();
+    }
+
+    public DIComponent getComponent(){
+        return diComponent;
+    }
+
+    public BaseRepo<ContactItem, Integer> getContactRepo(){
+        if (contactListRepo == null) {
+            contactListRepo = new ContactListRepoImpl(chatDialgDb.contatIlistDao());
+        }
+        return contactListRepo;
     }
 
     private void initImageLoader(Context context) {

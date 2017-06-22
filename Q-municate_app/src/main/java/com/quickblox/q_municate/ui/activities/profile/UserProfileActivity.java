@@ -285,7 +285,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
         } else {
             QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogOccupant.getDialog().getDialogId());
             if (chatDialog != null) {
-                QBDeleteChatCommand.start(this, chatDialog.getDialogId(), chatDialog.getType().getCode());
+                QBDeleteChatCommand.start(this, chatDialog.getDialogId(), chatDialog.getType());
             }
         }
     }

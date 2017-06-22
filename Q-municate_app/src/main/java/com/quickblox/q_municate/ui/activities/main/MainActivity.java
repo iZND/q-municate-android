@@ -69,7 +69,6 @@ public class MainActivity extends BaseLoggableActivity {
         }
 
         addDialogsAction();
-        launchDialogsListFragment();
     }
 
     private void initFields() {
@@ -146,6 +145,7 @@ public class MainActivity extends BaseLoggableActivity {
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
+        launchDialogsListFragment();
     }
 
     private void addDialogsAction() {

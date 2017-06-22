@@ -364,7 +364,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         }
 
         this.showProgress();
-        QBDeleteChatCommand.start(this, chatDialog.getDialogId(), chatDialog.getType().getCode());
+        QBDeleteChatCommand.start(this, chatDialog.getDialogId(), chatDialog.getType());
     }
 
     private void handleAddedFriends(Intent data) {

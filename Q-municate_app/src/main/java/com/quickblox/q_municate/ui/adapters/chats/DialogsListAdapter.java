@@ -49,14 +49,9 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (QBDialogType.PRIVATE.equals(currentDialog.getType())) {
-            //QMUser opponentUser = dialogWrapper.getOpponentUser();
-            //if (opponentUser.getFullName() != null) {
+        if (QBDialogType.PRIVATE.equals(currentDialog.getDialogType())) {
                 viewHolder.nameTextView.setText(currentDialog.getName());
-              //  displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
-            //} else {
-//                viewHolder.nameTextView.setText(resources.getString(R.string.deleted_user));
-  //          }
+            displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
         } else {
             viewHolder.nameTextView.setText(currentDialog.getName());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
