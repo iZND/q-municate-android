@@ -28,7 +28,7 @@ public class DialogTransformUtils {
         qbDialog.setPhoto(dialog.getPhoto());
         qbDialog.setName(dialog.getTitle());
         qbDialog.setOccupantsIds(createOccupantsIdsFromDialogOccupantsList(dialogOccupantsList));
-        qbDialog.setType(
+        qbDialog.setDialogType(
                 Dialog.Type.PRIVATE.equals(dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
 
         qbDialog.setUpdatedAt(new Date(dialog.getModifiedDateLocal()));

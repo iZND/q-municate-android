@@ -7,13 +7,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBRoster;
+import com.quickblox.chat.QBContactList;
 import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBContactListItem;
 import com.quickblox.chat.model.QBPresence;
-import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.R;
@@ -56,7 +56,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     private static final String ROSTER_INIT_ERROR = "ROSTER isn't initialized. Please make relogin";
 
     private QBRestHelper restHelper;
-    private QBRoster roster;
+    private QBContactList roster;
     private QBChatHelper chatHelper;
     private DataManager dataManager;
     private Timer userLoadingTimer;
@@ -77,9 +77,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         initThreads();
         restHelper = new QBRestHelper(context);
         dataManager = DataManager.getInstance();
-        roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual,
+        roster = QBChatService.getInstance().getRoster(QBContactList.SubscriptionMode.mutual,
                 new SubscriptionListener());
-        roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         userLoadingTimer = new Timer();
     }
@@ -152,14 +151,14 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void clearRosterEntry(int userId) throws Exception {
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        QBContactListItem rosterEntry = roster.getEntry(userId);
         if (rosterEntry != null && roster.contains(userId)) {
             roster.removeEntry(rosterEntry);
         }
     }
 
     private boolean isInvited(int userId) {
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        QBContactListItem rosterEntry = roster.getEntry(userId);
         if (rosterEntry == null) {
             return false;
         }
@@ -196,11 +195,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private Collection<Integer> createFriendList(
-            Collection<QBRosterEntry> rosterEntryCollection) throws QBResponseException {
+            Collection<QBContactListItem> rosterEntryCollection) throws QBResponseException {
         Collection<Integer> friendList = new ArrayList<>();
         Collection<Integer> userList = new ArrayList<>();
 
-        for (QBRosterEntry rosterEntry : rosterEntryCollection) {
+        for (QBContactListItem rosterEntry : rosterEntryCollection) {
             if (!UserFriendUtils.isOutgoingFriend(rosterEntry) && !UserFriendUtils.isNoneFriend(rosterEntry)) {
                 friendList.add(rosterEntry.getUserId());
             } else if (UserFriendUtils.isNoneFriend(rosterEntry)){
@@ -237,7 +236,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void updateFriend(int userId) throws QBResponseException {
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        QBContactListItem rosterEntry = roster.getEntry(userId);
 
         QMUser newUser = loadAndSaveUser(userId);
 

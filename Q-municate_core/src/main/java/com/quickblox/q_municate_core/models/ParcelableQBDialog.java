@@ -29,7 +29,7 @@ public class ParcelableQBDialog implements Parcelable {
     public ParcelableQBDialog(Parcel inputParcel) {
         dialog = new QBChatDialog(inputParcel.readString());
         dialog.setName(inputParcel.readString());
-        dialog.setType(QBDialogType.parseByCode(inputParcel.readInt()));
+        dialog.setDialogType(QBDialogType.parseByCode(inputParcel.readInt()));
         dialog.setRoomJid(inputParcel.readString());
         dialog.setLastMessage(inputParcel.readString());
         dialog.setLastMessageDateSent(inputParcel.readLong());
@@ -51,7 +51,7 @@ public class ParcelableQBDialog implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(dialog.getDialogId());
         parcel.writeString(dialog.getName());
-        parcel.writeInt(dialog.getType().getCode());
+        parcel.writeInt(dialog.getType());
         parcel.writeString(dialog.getRoomJid());
         parcel.writeString(dialog.getLastMessage());
         parcel.writeLong(dialog.getLastMessageDateSent());

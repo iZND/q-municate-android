@@ -56,7 +56,7 @@ public class ChatNotificationUtils {
         QBChatDialog qbDialog = new QBChatDialog(dialogId);
         qbDialog.setRoomJid(roomJid);
         qbDialog.setPhoto(photoUrl);
-        qbDialog.setType(qbDialogType);
+        qbDialog.setDialogType(qbDialogType);
 
         qbDialog.setName(dialogName);
 

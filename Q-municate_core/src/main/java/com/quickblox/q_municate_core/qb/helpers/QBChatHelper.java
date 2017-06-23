@@ -110,7 +110,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private void initCurrentDialogForChatIfPossible() {
         if (currentDialog != null && chatService != null && chatService.isLoggedIn()) {
             currentDialog.initForChat(chatService);
-            if (QBDialogType.GROUP.equals(currentDialog.getType())) {
+            if (QBDialogType.GROUP.equals(currentDialog.getDialogType())) {
                 tryJoinRoomChat(currentDialog);
                 currentDialog.addParticipantListener(participantListener);
             } else {
@@ -552,7 +552,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             return;
         }
         for (QBChatDialog dialog : qbDialogsList) {
-            if (QBDialogType.PRIVATE != dialog.getType()) {
+            if (QBDialogType.PRIVATE != dialog.getDialogType()) {
                 tryJoinRoomChat(dialog, null);
             }
         }
@@ -661,7 +661,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         QBChatDialog dialogToCreate = new QBChatDialog();
         dialogToCreate.setName(name);
-        dialogToCreate.setType(QBDialogType.GROUP);
+        dialogToCreate.setDialogType(QBDialogType.GROUP);
         dialogToCreate.setOccupantsIds(occupantIdsList);
         dialogToCreate.setPhoto(photoUrl);
 

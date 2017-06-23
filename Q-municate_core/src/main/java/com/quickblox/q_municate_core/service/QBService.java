@@ -373,7 +373,7 @@ public class QBService extends Service {
     }
 
 
-    // ------------------ other commands
+    // ------------------ other commandsF
     private void registerGetFileCommand() {
         ServiceCommand getFileCommand = new QBGetFileCommand(this,
                 QBServiceConsts.GET_FILE_SUCCESS_ACTION,
@@ -428,9 +428,7 @@ public class QBService extends Service {
         QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper, chatHelper,
                 QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
                 QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
-        QBLoadFriendListCommand loadFriendListCommand = new QBLoadFriendListCommand(this, friendListHelper,
-                QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION,
-                QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
+
         QBInitCallChatCommand initVideoChatCommand = (QBInitCallChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_CALL_CHAT_ACTION);
 
         ServiceCommand joinCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
@@ -440,7 +438,6 @@ public class QBService extends Service {
         loginCommand.addCommand(initChatsCommand);
         loginCommand.addCommand(joinCommand);
         loginCommand.addCommand(initFriendListCommand);
-        loginCommand.addCommand(loadFriendListCommand);
         loginCommand.addCommand(initVideoChatCommand);
     }
 

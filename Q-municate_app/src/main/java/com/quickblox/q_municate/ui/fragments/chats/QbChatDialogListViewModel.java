@@ -18,6 +18,8 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
@@ -73,7 +75,14 @@ public class QbChatDialogListViewModel extends ViewModel {
                         requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
                         requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
                         try {
-                            QMUserService.getInstance().getUsersByIDsSync(friendIdsList, requestBuilder);
+                            List<QMUser> usersByIDsSync = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, requestBuilder);
+                            ArrayList<Friend> friends = new ArrayList<>(usersByIDsSync.size());
+                            for (QMUser qmUser : usersByIDsSync) {
+                                friends.add(new Friend(qmUser));
+                            }
+
+                            DataManager.getInstance().getFriendDataManager().createOrUpdateAll(friends);
+
                         } catch (QBResponseException e) {
                             e.printStackTrace();
                         }

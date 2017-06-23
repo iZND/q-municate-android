@@ -1,5 +1,6 @@
 package com.quickblox.q_municate_core.utils;
 
+import com.quickblox.chat.model.QBContactListItem;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -68,16 +69,16 @@ public class UserFriendUtils {
         return qbUser;
     }
 
-    public static boolean isOutgoingFriend(QBRosterEntry rosterEntry) {
+    public static boolean isOutgoingFriend(QBContactListItem rosterEntry) {
         return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
     }
 
-    public static boolean isNoneFriend(QBRosterEntry rosterEntry) {
+    public static boolean isNoneFriend(QBContactListItem rosterEntry) {
         return RosterPacket.ItemType.none.equals(rosterEntry.getType())
                 || RosterPacket.ItemType.from.equals(rosterEntry.getType());
     }
 
-    public static boolean isEmptyFriendsStatus(QBRosterEntry rosterEntry) {
+    public static boolean isEmptyFriendsStatus(QBContactListItem rosterEntry) {
         return rosterEntry.getStatus() == null;
     }
 

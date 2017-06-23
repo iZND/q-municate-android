@@ -6,6 +6,7 @@ import android.util.Log;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
@@ -28,13 +29,20 @@ public class DbUtils {
 
     public static DialogOccupant saveDialogOccupantIfUserNotExists(DataManager dataManager,
                                                                    String dialogId, int userId, DialogOccupant.Status status) {
-        QBRestHelper.loadAndSaveUser(userId);
 
-        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
-        DialogOccupant dialogOccupant = ChatUtils.createDialogOccupant(dataManager, dialogId, user);
-        dialogOccupant.setStatus(status);
+        QMUser user = null;
+        try {
+            user = QMUserService.getInstance().getUserSync(userId, false);
+        } catch (QBResponseException e) {
+            e.printStackTrace();
+        }
+        DialogOccupant dialogOccupant = null;
+        if (user != null) {
+            dialogOccupant = ChatUtils.createDialogOccupant(dataManager, dialogId, user);
+            dialogOccupant.setStatus(status);
 
-        saveDialogOccupant(dataManager, dialogOccupant);
+            saveDialogOccupant(dataManager, dialogOccupant);
+        }
 
         return dialogOccupant;
     }

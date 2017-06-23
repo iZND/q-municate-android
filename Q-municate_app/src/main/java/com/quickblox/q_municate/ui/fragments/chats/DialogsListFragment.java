@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -435,13 +436,18 @@ public class DialogsListFragment extends BaseFragment {
     }
 
     private void startPrivateChatActivity(QBChatDialog chatDialog) {
-        List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(chatDialog.getDialogId());
-        List<Integer> occupants = chatDialog.getOccupants();
-        occupants.remove(AppSession.getSession().getUser().getId());
-        QMUser opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
 
-        if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
+        List<Integer> occupants = chatDialog.getOccupants();
+        Log.i(TAG, "occupants="+occupants);
+        occupants.remove(AppSession.getSession().getUser().getId());
+        QMUser opponent = null;
+        try {
+            opponent = QMUserService.getInstance().getUserSync(occupants.get(0), false);
+        } catch (QBResponseException e) {
+            e.printStackTrace();
+        }
+
+        if (opponent != null && !TextUtils.isEmpty(chatDialog.getDialogId())) {
             PrivateDialogActivity.startForResult(this, opponent, chatDialog, PICK_DIALOG);
         }
     }
