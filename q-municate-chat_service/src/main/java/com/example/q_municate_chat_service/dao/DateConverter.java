@@ -4,11 +4,14 @@ package com.example.q_municate_chat_service.dao;
 import android.arch.persistence.room.TypeConverter;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DateConverter {
     @TypeConverter
@@ -57,6 +60,18 @@ public class DateConverter {
 
         String listString = TextUtils.join(", ", integerList);
         return listString;
+    }
+
+    @TypeConverter
+    public static String fromMap(Map<String, String> map) {
+        Gson gson = new Gson();
+        return gson.toJson(map);
+    }
+
+    @TypeConverter
+    public static Map<String, String> toMap(String jsonString) {
+        Gson gson = new Gson();
+        return (Map<String, String>)(gson.fromJson(jsonString, Map.class));
     }
 
 }

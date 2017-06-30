@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.q_municate_chat_service.entity.QBMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -21,26 +22,26 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     private ColorUtils colorUtils;
 
     public GroupChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog chatDialog,
-                                    List<CombinationMessage> chatMessages) {
+                                    List<QBMessage> chatMessages) {
         super(baseActivity, chatDialog, chatMessages);
         colorUtils = new ColorUtils();
     }
 
     @Override
-    protected void onBindViewCustomHolder(QBMessageViewHolder holder, CombinationMessage chatMessage, int position) {
+    protected void onBindViewCustomHolder(QBMessageViewHolder holder, QBMessage chatMessage, int position) {
         RequestsViewHolder viewHolder = (RequestsViewHolder) holder;
         boolean notificationMessage = chatMessage.getNotificationType() != null;
 
         if (notificationMessage) {
             viewHolder.messageTextView.setText(chatMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getCreatedDate()));
+            viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getDateSent()));
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
         }
 
-        if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
+        /*if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
             updateMessageState(chatMessage, chatDialog);
-        }
+        }*/
     }
 
     @Override
@@ -49,14 +50,14 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     }
 
     @Override
-    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
+    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, QBMessage chatMessage, int position) {
         holder.timeTextMessageTextView.setVisibility(View.GONE);
 
         String senderName;
-        senderName = chatMessage.getDialogOccupant().getUser().getFullName();
+        senderName = "";//chatMessage.getDialogOccupant().getUser().getFullName();
 
         TextView opponentNameTextView = (TextView) holder.itemView.findViewById(R.id.opponent_name_text_view);
-        opponentNameTextView.setTextColor(colorUtils.getRandomTextColorById(chatMessage.getDialogOccupant().getUser().getId()));
+        opponentNameTextView.setTextColor(colorUtils.getRandomTextColorById(currentUser.getId()));
         opponentNameTextView.setText(senderName);
 
         TextView customMessageTimeTextView = (TextView) holder.itemView.findViewById(R.id.custom_msg_text_time_message);

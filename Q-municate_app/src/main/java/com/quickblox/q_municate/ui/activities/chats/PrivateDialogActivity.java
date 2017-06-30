@@ -216,10 +216,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void findLastFriendsRequest(boolean needNotifyAdapter) {
-        ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        /*((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         if (needNotifyAdapter) {
             messagesAdapter.notifyDataSetChanged();
-        }
+        }*/
     }
 
     private void setOnlineStatus(QMUser user) {

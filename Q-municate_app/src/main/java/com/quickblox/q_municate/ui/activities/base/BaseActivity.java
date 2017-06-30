@@ -28,6 +28,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.arch.lifecycle.LifecycleActivity;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.LifecycleRegistry;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
@@ -77,7 +80,8 @@ import java.util.Set;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
+public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge,
+        ConnectionBridge, LoadingBridge, SnackbarBridge, LifecycleRegistryOwner  {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
 
@@ -115,7 +119,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private ViewGroup root;
     private boolean isUIDisabled;
 
+    private LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
+    }
+
+
     protected abstract int getContentResId();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
