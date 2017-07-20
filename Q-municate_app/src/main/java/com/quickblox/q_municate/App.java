@@ -13,7 +13,6 @@ import com.example.q_municate_chat_service.QBChatDilogRepository;
 import com.example.q_municate_chat_service.db.QbChatDialogDatabase;
 import com.example.q_municate_chat_service.entity.ContactItem;
 import com.example.q_municate_chat_service.repository.BaseRepo;
-import com.example.q_municate_chat_service.repository.ContactListRepo;
 import com.example.q_municate_chat_service.repository.ContactListRepoImpl;
 import com.quickblox.q_municate.di.ChatDialogModule;
 import com.nostra13.universalimageloader.core.ImageLoader;

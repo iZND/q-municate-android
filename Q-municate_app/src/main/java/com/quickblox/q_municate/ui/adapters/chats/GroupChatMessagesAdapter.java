@@ -5,13 +5,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.q_municate_chat_service.entity.GroupNotification;
 import com.example.q_municate_chat_service.entity.QBMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
+import com.quickblox.q_municate.utils.chat.ChatMessageUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_db.models.State;
 
 import java.util.List;
@@ -33,8 +36,11 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         boolean notificationMessage = chatMessage.getNotificationType() != null;
 
         if (notificationMessage) {
-            viewHolder.messageTextView.setText(chatMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getDateSent()));
+            if (chatMessage.getNotificationType() instanceof GroupNotification) {
+                String msgBody = ChatMessageUtils.getBodyForUpdateChatNotificationMessage(baseActivity, chatMessage);
+                viewHolder.messageTextView.setText(msgBody);
+                viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getDateSent()));
+            }
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
         }

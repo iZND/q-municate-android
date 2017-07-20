@@ -83,7 +83,7 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem, Integer> {
     }
 
     @Override
-    public LiveData<ContactItem> loaById(Integer integer) {
+    public LiveData<ContactItem> loadById(Integer integer) {
         return null;
     }
 

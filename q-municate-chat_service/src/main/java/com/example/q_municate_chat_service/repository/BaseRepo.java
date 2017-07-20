@@ -11,7 +11,7 @@ public interface BaseRepo<T, ID>{
 
     LiveData<List<T>> loadAll();
 
-    LiveData<T> loaById(ID id);
+    LiveData<T> loadById(ID id);
 
     void delete(T event);
 }

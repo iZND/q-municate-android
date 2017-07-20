@@ -31,7 +31,7 @@ public class QBMessage extends QBChatMessage {
         setRecipientId(chatMessage.getRecipientId());
         setSenderId(chatMessage.getSenderId());
         setSaveToHistory(chatMessage.isSaveToHistory());
-        setProperties(getProperties());
+        setProperties(chatMessage.getProperties());
         setNotificationType(NotificationsParser.getNotificationType(chatMessage));
     }
 

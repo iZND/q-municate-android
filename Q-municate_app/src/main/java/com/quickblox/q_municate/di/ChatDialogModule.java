@@ -1,11 +1,13 @@
 package com.quickblox.q_municate.di;
 
-import com.example.q_municate_chat_service.QBChatDilogRepository;
-import com.example.q_municate_chat_service.QBChatDilogRepositoryImpl;
+import com.example.q_municate_chat_service.repository.QBChatDilogRepositoryImpl;
 import com.example.q_municate_chat_service.dao.QBChatDialogDao;
 import com.example.q_municate_chat_service.dao.QBMessageDao;
 import com.example.q_municate_chat_service.db.QbChatDialogDatabase;
+import com.example.q_municate_chat_service.entity.QBMessage;
+import com.example.q_municate_chat_service.repository.BaseRepo;
 import com.example.q_municate_chat_service.repository.QBMessageRepo;
+import com.quickblox.chat.model.QBChatDialog;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,7 +37,7 @@ public class ChatDialogModule {
     }
 
     @Provides
-    public QBChatDilogRepository createChatDialogRepo(QBChatDialogDao dialogDao){
+    public QBChatDilogRepositoryImpl createChatDialogRepo(QBChatDialogDao dialogDao){
         return new QBChatDilogRepositoryImpl(dialogDao);
     }
 

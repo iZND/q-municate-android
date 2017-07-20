@@ -64,7 +64,7 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage, String> {
     }
 
     @Override
-    public LiveData<QBMessage> loaById(String s) {
+    public LiveData<QBMessage> loadById(String s) {
         return null;
     }
 

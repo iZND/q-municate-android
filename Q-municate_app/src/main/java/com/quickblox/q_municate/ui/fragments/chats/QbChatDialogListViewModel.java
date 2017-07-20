@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.example.q_municate_chat_service.QBChatDilogRepository;
 import com.example.q_municate_chat_service.entity.ContactItem;
+import com.example.q_municate_chat_service.repository.BaseRepo;
+import com.example.q_municate_chat_service.repository.QBChatDilogRepositoryImpl;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
@@ -40,7 +42,7 @@ public class QbChatDialogListViewModel extends ViewModel {
     private LiveData<List<QBChatDialog>> dialogs = new MutableLiveData<>();
 
     @Inject
-    QBChatDilogRepository repository;
+    QBChatDilogRepositoryImpl repository;
 
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
 

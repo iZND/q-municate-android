@@ -1,28 +1,19 @@
 package com.example.q_municate_chat_service.entity;
 
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
 
-import static com.example.q_municate_chat_service.entity.NotificationType.TABLE_NAME;
+public abstract class NotificationType {
 
+    protected String notificationType;
 
-@Entity(tableName = TABLE_NAME)
-public class NotificationType {
+    protected int internalType;
 
-    public static final String TABLE_NAME = "notification_type";
-    @PrimaryKey
-    private long id;
+    protected String info;
 
-    private String notificationType;
+    protected String body;
 
-    private int internalType;
-
-    private String info;
-
-    enum Type{
-        GORUP_NOTIFICATION,
-        CALL_NOTIFICATION
+    public String getBody(){
+        return body;
     }
 
 }
