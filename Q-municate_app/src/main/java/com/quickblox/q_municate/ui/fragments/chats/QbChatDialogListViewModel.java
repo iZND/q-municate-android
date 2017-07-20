@@ -55,48 +55,20 @@ public class QbChatDialogListViewModel extends ViewModel {
         dialogs.observeForever(new Observer<List<QBChatDialog>>() {
             @Override
             public void onChanged(final @Nullable List<QBChatDialog> qbChatDialogs) {
-                        initContactlist();
+                FinderUnknownUsers finderUnknownUsers =
+                                new FinderUnknownUsers(qbChatDialogs);
+                finderUnknownUsers.find();
+
             }
         });
     }
 
     private void initContactlist(){
 
-        App.getInstance().getContactRepo().loadAll().observeForever(new Observer<List<ContactItem>>() {
-            @Override
-            public void onChanged(final @Nullable List<ContactItem> contactItemList) {
-
-                ioExecuotr.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        Collection<Integer> friendIdsList = new ArrayList<>(contactItemList.size());
-                        for (ContactItem contactItem : contactItemList) {
-                            friendIdsList.add(contactItem.getUserId());
-                        }
-                        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-                        requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
-                        requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-                        try {
-                            List<QMUser> usersByIDsSync = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, requestBuilder);
-                            ArrayList<Friend> friends = new ArrayList<>(usersByIDsSync.size());
-                            for (QMUser qmUser : usersByIDsSync) {
-                                friends.add(new Friend(qmUser));
-                            }
-
-                            DataManager.getInstance().getFriendDataManager().createOrUpdateAll(friends);
-
-                        } catch (QBResponseException e) {
-                            e.printStackTrace();
-                        }
-                    };
-                });
-            }
-        });
     }
 
     public LiveData<List<QBChatDialog>> getDialogs() {
-        intDialogs();
-        return dialogs;
+        return repository.loadAll();
     }
 
     public void removeDialog(final QBChatDialog dialog){

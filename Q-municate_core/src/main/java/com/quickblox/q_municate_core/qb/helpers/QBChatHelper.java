@@ -275,7 +275,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public void saveDialogsToCache(List<QBChatDialog> qbDialogsList, boolean allDialogs){
         if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
-            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
+            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(AppSession.getSession().getUser(), qbDialogsList);
             finderUnknownUsers.find();
             if(allDialogs) {
                 DbUtils.saveDialogsToCacheAll(DataManager.getInstance(), qbDialogsList, currentDialog);
@@ -521,7 +521,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         String roomJidId = qbDialog.getRoomJid();
         if (roomJidId != null) {
             tryJoinRoomChat(qbDialog);
-            new FinderUnknownUsers(context, chatCreator, qbDialog).find();
+            new FinderUnknownUsers(chatCreator, qbDialog).find();
         }
 
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(parseReceivedMessage(qbChatMessage));

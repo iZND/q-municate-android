@@ -40,7 +40,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
                 boolean networkAvailable = ((BaseActivity) activity).isNetworkAvailable();
                 Log.d(TAG, "networkAvailable" + networkAvailable);
                 if (canLogin) {
-                    QBLoginChatCompositeCommand.start(activity);
+                    //QBLoginChatCompositeCommand.start(activity);
                 }
             }
         }

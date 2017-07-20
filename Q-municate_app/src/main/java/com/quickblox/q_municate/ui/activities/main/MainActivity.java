@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -13,6 +16,7 @@ import android.view.View;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.service.Consts;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
@@ -69,6 +73,23 @@ public class MainActivity extends BaseLoggableActivity {
         }
 
         addDialogsAction();
+    }
+
+    @Override
+    protected Messenger getMessenger() {
+        return new Messenger(new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case Consts.EXTRA_LOGIN_RESULT_CODE:
+                        performLoginChatSuccessAction(null);
+                        break;
+                    default:
+                        super.handleMessage(msg);
+
+                }
+            }
+        });
     }
 
     private void initFields() {

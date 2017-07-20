@@ -215,6 +215,7 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
         </service>
+        <service android:name=".service.AndroidChatService" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

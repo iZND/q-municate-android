@@ -11,6 +11,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -37,6 +39,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.service.AndroidChatService;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
@@ -666,7 +669,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void loginChat() {
         isDialogLoading = true;
         showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
-        QBLoginChatCompositeCommand.start(this);
+        AndroidChatService.login(this, AppSession.getSession().getUser(), getMessenger());
+        //QBLoginChatCompositeCommand.start(this);
+    }
+
+    protected Messenger getMessenger() {
+        return null;
     }
 
     protected boolean isAppInitialized() {

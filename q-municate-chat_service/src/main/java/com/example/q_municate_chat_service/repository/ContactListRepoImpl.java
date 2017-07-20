@@ -32,6 +32,7 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem, Integer> {
 
         roster = QBChatService.getInstance().getRoster(QBContactList.SubscriptionMode.mutual,
                 new SubscriptionListener());
+        Log.i(TAG, "loading roster");
     }
 
     @Override
@@ -94,8 +95,9 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem, Integer> {
 
     @Override
     protected void performApiReuqest() {
-        Collection<QBContactListItem> entries = roster.getEntries();
 
+        Collection<QBContactListItem> entries = roster.getEntries();
+        Log.i(TAG, "performApiReuqest entries:"+roster.getEntries());
         ArrayList<ContactItem> items = new ArrayList<>(entries.size());
         for (QBContactListItem entry : entries) {
             items.add(new ContactItem(entry.getRosterEntry()));

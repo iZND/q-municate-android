@@ -18,30 +18,24 @@ import java.util.Set;
 
 public class FinderUnknownUsers {
 
-    private Context context;
     private QBChatDialog  dialog;
     private List<QBChatDialog > dialogsList;
     private Set<Integer> loadIdsSet;
     private QBUser currentUser;
-    private QBRestHelper restHelper;
-    private DataManager dataManager;
 
-    public FinderUnknownUsers(Context context, QBUser currentUser, List<QBChatDialog > dialogsList) {
-        init(context, currentUser);
+    public FinderUnknownUsers(QBUser currentUser, List<QBChatDialog > dialogsList) {
+        init( currentUser);
         this.dialogsList = dialogsList;
     }
 
-    public FinderUnknownUsers(Context context, QBUser currentUser, QBChatDialog  dialog) {
-        init(context, currentUser);
+    public FinderUnknownUsers(QBUser currentUser, QBChatDialog  dialog) {
+        init( currentUser);
         this.dialog = dialog;
     }
 
-    private void init(Context context, QBUser currentUser) {
-        this.context = context;
+    private void init(QBUser currentUser) {
         this.currentUser = currentUser;
         loadIdsSet = new HashSet<Integer>();
-        restHelper = new QBRestHelper(context);
-        dataManager = DataManager.getInstance();
     }
 
     public void find() {
