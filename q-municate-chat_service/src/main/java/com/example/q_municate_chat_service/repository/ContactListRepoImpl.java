@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class ContactListRepoImpl extends BaseRepoImpl<ContactItem, Integer> {
+public class ContactListRepoImpl extends BaseRepoImpl<ContactItem> implements BaseRepo<ContactItem, Integer>{
 
     private static final String TAG = ContactListRepoImpl.class.getSimpleName();
 

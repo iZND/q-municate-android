@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public abstract class BaseRepoImpl<T, Id> implements BaseRepo<T, Id>{
+public abstract class BaseRepoImpl<T>{
 
     protected final MediatorLiveData<List<T>> result = new MediatorLiveData<>();
 

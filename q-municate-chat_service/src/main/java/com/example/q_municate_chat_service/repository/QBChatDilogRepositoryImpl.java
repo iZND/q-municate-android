@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.q_municate_chat_service.QBChatDilogRepository;
 import com.example.q_municate_chat_service.dao.QBChatDialogDao;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
@@ -16,7 +17,9 @@ import com.quickblox.core.helper.CollectionsUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog, String> {
+import rx.Completable;
+
+public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implements QBChatDialogRepository{
 
     public static final String TAG = QBChatDilogRepositoryImpl.class.getSimpleName();
 
@@ -28,12 +31,12 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog, String
 
 
     @Override
-    public void create(QBChatDialog dialog) {
-        //
+    public Completable create(QBChatDialog dialog) {
+        return null;
     }
 
     @Override
-    public LiveData<List<QBChatDialog>> loadAll() {
+    public LiveData<List<QBChatDialog>> load(int pageNumber, int count) {
         Log.i(TAG, "loadAll");
         final LiveData<List<QBChatDialog>> dbSource = chatDialogDao.getAll();
         result.addSource(dbSource, new Observer<List<QBChatDialog>>() {
@@ -76,8 +79,14 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog, String
     }
 
     @Override
-    public void delete(QBChatDialog dialog) {
+    public Completable delete(QBChatDialog dialog) {
         chatDialogDao.delete(dialog);
+        return null;
+    }
+
+    @Override
+    public Completable update(QBChatDialog event) {
+        return null;
     }
 
     @Override

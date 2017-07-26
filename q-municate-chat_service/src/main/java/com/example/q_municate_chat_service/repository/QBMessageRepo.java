@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class QBMessageRepo extends BaseRepoImpl<QBMessage, String> {
+public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<QBMessage, String>{
 
     private static final String TAG = QBMessageRepo.class.getSimpleName();
 

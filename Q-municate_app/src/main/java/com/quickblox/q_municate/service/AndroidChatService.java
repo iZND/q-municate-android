@@ -170,16 +170,6 @@ public class AndroidChatService extends Service {
         sendResultToActivity(true, null);
     }
 
-    /*private void initPingListener() {
-        ChatPingAlarmManager.onCreate(this);
-        ChatPingAlarmManager.getInstanceFor().addPingListener(new PingFailedListener() {
-            @Override
-            public void pingFailed() {
-                Log.d(TAG, "Ping chat server failed");
-            }
-        });
-    }*/
-
     private void sendResultToActivity(boolean isSuccess, String errorMessage) {
         if (messenger != null) {
             Log.d(TAG, "sendResultToActivity()");

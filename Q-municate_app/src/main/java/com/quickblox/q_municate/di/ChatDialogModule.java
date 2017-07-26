@@ -8,6 +8,7 @@ import com.example.q_municate_chat_service.entity.QBMessage;
 import com.example.q_municate_chat_service.repository.BaseRepo;
 import com.example.q_municate_chat_service.repository.QBMessageRepo;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.q_municate.business.RepositoryManager;
 
 import dagger.Module;
 import dagger.Provides;
@@ -39,6 +40,11 @@ public class ChatDialogModule {
     @Provides
     public QBChatDilogRepositoryImpl createChatDialogRepo(QBChatDialogDao dialogDao){
         return new QBChatDilogRepositoryImpl(dialogDao);
+    }
+
+    @Provides
+    public RepositoryManager createRepoManager(QBChatDilogRepositoryImpl dialogDao){
+        return new RepositoryManager(dialogDao);
     }
 
 }

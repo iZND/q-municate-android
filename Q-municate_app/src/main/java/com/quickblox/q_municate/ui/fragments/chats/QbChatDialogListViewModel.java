@@ -17,6 +17,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.business.RepositoryManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
@@ -42,7 +43,7 @@ public class QbChatDialogListViewModel extends ViewModel {
     private LiveData<List<QBChatDialog>> dialogs = new MutableLiveData<>();
 
     @Inject
-    QBChatDilogRepositoryImpl repository;
+    RepositoryManager repository;
 
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
 
@@ -50,25 +51,12 @@ public class QbChatDialogListViewModel extends ViewModel {
 
     }
 
-    private void intDialogs(){
-        dialogs = repository.loadAll();
-        dialogs.observeForever(new Observer<List<QBChatDialog>>() {
-            @Override
-            public void onChanged(final @Nullable List<QBChatDialog> qbChatDialogs) {
-                FinderUnknownUsers finderUnknownUsers =
-                                new FinderUnknownUsers(qbChatDialogs);
-                finderUnknownUsers.find();
-
-            }
-        });
-    }
-
     private void initContactlist(){
 
     }
 
     public LiveData<List<QBChatDialog>> getDialogs() {
-        return repository.loadAll();
+        return repository.loadDialogs();
     }
 
     public void removeDialog(final QBChatDialog dialog){
