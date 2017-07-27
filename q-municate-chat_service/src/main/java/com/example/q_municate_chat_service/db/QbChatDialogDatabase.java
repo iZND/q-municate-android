@@ -8,11 +8,13 @@ import com.example.q_municate_chat_service.dao.ContactListDao;
 import com.example.q_municate_chat_service.dao.DateConverter;
 import com.example.q_municate_chat_service.dao.QBChatDialogDao;
 import com.example.q_municate_chat_service.dao.QBMessageDao;
+import com.example.q_municate_chat_service.dao.QMUserDao;
 import com.example.q_municate_chat_service.entity.ContactItem;
 import com.example.q_municate_chat_service.entity.QBMessage;
+import com.example.q_municate_chat_service.entity.user.QMUser;
 import com.quickblox.chat.model.QBChatDialog;
 
-@Database(entities = {QBChatDialog.class, ContactItem.class, QBMessage.class}, version = 1)
+@Database(entities = {QBChatDialog.class, ContactItem.class, QBMessage.class, QMUser.class}, version = 1)
 @TypeConverters({DateConverter.class})
 public abstract class QbChatDialogDatabase extends RoomDatabase {
     public abstract QBChatDialogDao chatDialogDao();
@@ -20,4 +22,6 @@ public abstract class QbChatDialogDatabase extends RoomDatabase {
     public abstract ContactListDao contatIlistDao();
 
     public abstract QBMessageDao chatMessageDao();
+
+    public abstract QMUserDao userDao();
 }

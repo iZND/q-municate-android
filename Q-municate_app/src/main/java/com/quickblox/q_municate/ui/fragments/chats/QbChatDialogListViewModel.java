@@ -60,12 +60,10 @@ public class QbChatDialogListViewModel extends ViewModel {
     }
 
     public void removeDialog(final QBChatDialog dialog){
-        ioExecuotr.execute(new Runnable() {
-            @Override
-            public void run() {
+        ioExecuotr.execute(()->  {
                 repository.delete(dialog);
             }
-        });
+        );
 
     }
 

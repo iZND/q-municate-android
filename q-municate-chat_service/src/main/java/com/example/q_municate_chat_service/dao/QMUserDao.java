@@ -2,6 +2,7 @@ package com.example.q_municate_chat_service.dao;
 
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -13,8 +14,12 @@ import com.example.q_municate_chat_service.entity.user.QMUser;
 import java.util.Collection;
 import java.util.List;
 
+import rx.Completable;
+import rx.Observable;
+
 import static com.example.q_municate_chat_service.entity.user.QMUser.TABLE_NAME;
 
+@Dao
 public interface QMUserDao {
 
     @Query("SELECT * FROM "+TABLE_NAME)
@@ -26,14 +31,13 @@ public interface QMUserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<QMUser> users);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long create(QMUser user);
+
     @Delete
-    void delete(QMUser contactItem);
+    int delete(QMUser user);
 
-    void deleteUserByExternalId(String externalId);
+    @Query("SELECT * FROM "+TABLE_NAME +" where id in (:userIds)")
+    Observable<List<QMUser>> getUsersByIDs(List<Integer> idsList);
 
-    List<QMUser> getUsersByIDs(Collection<Integer> idsList);
-
-    QMUser getUserByColumn(String column, String value);
-
-    List<QMUser> getUsersByFilter(Collection<?> filterValue, String filter);
 }

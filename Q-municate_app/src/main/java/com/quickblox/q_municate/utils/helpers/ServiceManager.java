@@ -7,6 +7,7 @@ import android.util.Log;
 import com.digits.sdk.android.Digits;
 import com.digits.sdk.android.DigitsOAuthSigning;
 import com.digits.sdk.android.DigitsSession;
+import com.example.q_municate_chat_service.repository.QMUserRepository;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSession;
@@ -44,6 +45,8 @@ import com.twitter.sdk.android.core.TwitterCore;
 import java.io.File;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -66,7 +69,9 @@ public class ServiceManager {
     private Context context;
 
     private QMAuthService authService;
-    private QMUserService userService;
+
+    @Inject
+    private QMUserRepository userRepository;
 
     public static ServiceManager getInstance() {
         if (instance == null) {
@@ -78,8 +83,6 @@ public class ServiceManager {
     private ServiceManager() {
         this.context = App.getInstance();
         authService = QMAuthService.getInstance();
-        userService = QMUserService.getInstance();
-
     }
 
     public Observable<QBUser> login(QBUser user) {
@@ -308,8 +311,7 @@ public class ServiceManager {
     }
 
     private void saveOwnerUser(QBUser qbUser) {
-        QMUser user = UserFriendUtils.createLocalUser(qbUser);
-        QMUserService.getInstance().getUserCache().createOrUpdate(user);
+        userRepository.save(com.example.q_municate_chat_service.entity.user.QMUser.convert(qbUser));
     }
 
 
