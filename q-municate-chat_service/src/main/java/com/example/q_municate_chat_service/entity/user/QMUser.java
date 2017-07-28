@@ -2,7 +2,9 @@ package com.example.q_municate_chat_service.entity.user;
 
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -34,6 +36,18 @@ public class QMUser extends QBUser {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    @Ignore
+    public void setListTags(StringifyArrayList<String> tags) {
+        super.setListTags(tags);
+    }
+
+    @Override
+    @Ignore
+    public StringifyArrayList<String> getListTags() {
+        return super.getListTags();
     }
 
     public static QMUser convert(QBUser qbUser){

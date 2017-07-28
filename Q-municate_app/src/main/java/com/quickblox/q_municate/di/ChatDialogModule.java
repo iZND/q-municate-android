@@ -37,6 +37,11 @@ public class ChatDialogModule {
     }
 
     @Provides
+    public QMUserDao createUserDao(){
+        return dialogDatabase.userDao();
+    }
+
+    @Provides
     public QBMessageRepo createChatMessageRepo(QBMessageDao dialogDao){
         return new QBMessageRepo(dialogDao);
     }
@@ -52,8 +57,8 @@ public class ChatDialogModule {
     }
 
     @Provides
-    public RepositoryManager createRepoManager(QBChatDilogRepositoryImpl dialogDao){
-        return new RepositoryManager(dialogDao);
+    public RepositoryManager createRepoManager(QBChatDilogRepositoryImpl dialogDao, QMUserRepository userRepository){
+        return new RepositoryManager(dialogDao, userRepository);
     }
 
 

@@ -92,6 +92,11 @@ android {
         abortOnError false
     }
 
+    dataBinding {
+        enabled = true
+    }
+
+
 /*    applicationVariants.all { variant ->
         changeApkFileName(variant)
     }*/

@@ -10,6 +10,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -39,7 +40,8 @@ public class RepositoryManager {
                 FinderUnknownUsers finderUnknownUsers =
                         new FinderUnknownUsers(AppSession.getSession().getUser(), qbChatDialogs);
                 Collection<Integer> integers = finderUnknownUsers.find();
-                userRepository.loadByIds(integers).subscribeOn(Schedulers.io())
+                List<Integer> userIds = new ArrayList<>(integers);
+                userRepository.loadByIds(userIds).subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()).subscribe();
             });
 

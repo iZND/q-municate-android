@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.databinding.ItemDialogBinding;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
@@ -33,10 +35,12 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
         //QBChatDialog dialogWrapper = getItem(position);
         QBChatDialog currentDialog = getItem(position);
 
+        ItemDialogBinding binding;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_dialog, null);
 
-            viewHolder = new ViewHolder();
+            binding = ItemDialogBinding.inflate(layoutInflater, parent, false);
+            viewHolder = new ViewHolder(binding);
 
             viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
             viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
@@ -47,18 +51,21 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
+            binding = viewHolder.binding;
         }
 
         if (QBDialogType.PRIVATE.equals(currentDialog.getDialogType())) {
-                viewHolder.nameTextView.setText(currentDialog.getName());
+              //  viewHolder.nameTextView.setText(currentDialog.getName());
             displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
         } else {
-            viewHolder.nameTextView.setText(currentDialog.getName());
+            //viewHolder.nameTextView.setText(currentDialog.getName());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
             displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
         }
 
-        long totalCount = currentDialog.getUnreadMessageCount();
+        binding.setDialog(currentDialog);
+        binding.executePendingBindings();
+        /*long totalCount = currentDialog.getUnreadMessageCount();
 
         if (totalCount > ConstsCore.ZERO_INT_VALUE) {
             viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
@@ -67,7 +74,7 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        viewHolder.lastMessageTextView.setText(currentDialog.getLastMessage());
+        viewHolder.lastMessageTextView.setText(currentDialog.getLastMessage());*/
 
         return convertView;
     }
@@ -119,5 +126,10 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
         public TextView nameTextView;
         public TextView lastMessageTextView;
         public TextView unreadMessagesTextView;
+        public ItemDialogBinding binding;
+
+        ViewHolder(ItemDialogBinding binding){
+            this.binding = binding;
+        }
     }
 }

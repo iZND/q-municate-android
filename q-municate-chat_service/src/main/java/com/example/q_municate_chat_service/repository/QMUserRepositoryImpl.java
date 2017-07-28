@@ -12,13 +12,11 @@ import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import rx.Completable;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import rx.functions.Func1;
 
 public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUserRepository {
 
@@ -46,21 +44,26 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
     }
 
     @Override
-    public Observable<List<QMUser>> loadByIds(final Collection<Integer> usersIds) {
-            return userDao.getUsersByIDs(usersIds).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).
-                    flatMap( (List<QMUser> users) -> {
-                        Log.i(TAG, "flatMap" + users);
-                        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByIDs(usersIds, null);
-                        final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
-                        return observable.map(qbUsers -> {
+    public Observable<List<QMUser>> loadByIds(final List<Integer> usersIds) {
+
+        return Observable.defer( () -> {
+                List<QMUser> cacheUsers = userDao.getUsersByIDs(usersIds);
+                if (cacheUsers.size() == 0) {
+                    Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByIDs(usersIds, null);
+                    final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
+
+                    return observable.map( (qbUsers) -> {
                             Log.i(TAG, "map" + qbUsers);
                             List<QMUser> qmUsers = QMUser.convertList(qbUsers);
                             userDao.insertAll(qmUsers);
                             return qmUsers;
-                        });
+
                     });
-    };
+                } else {
+                    return Observable.just(cacheUsers);
+                }
+            });
+    }
 
     @Override
     public Completable update(QMUser event) {
@@ -69,7 +72,8 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
 
     @Override
     public Completable save(QMUser user) {
-           return userDao.create(user);
+        userDao.create(user);
+        return null;
     }
 
     @Override

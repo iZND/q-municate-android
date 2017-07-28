@@ -5,6 +5,7 @@ import android.arch.persistence.room.TypeConverter;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.quickblox.core.helper.StringifyArrayList;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
@@ -72,6 +73,17 @@ public class DateConverter {
     public static Map<String, String> toMap(String jsonString) {
         Gson gson = new Gson();
         return (Map<String, String>)(gson.fromJson(jsonString, Map.class));
+    }
+
+    @TypeConverter
+    public static String strListToArray(StringifyArrayList<String> list) {
+        String listString = TextUtils.join(", ", list);
+        return listString;
+    }
+
+    @TypeConverter
+    public static StringifyArrayList<String> fromStrList(String value) {
+        return null;
     }
 
 }

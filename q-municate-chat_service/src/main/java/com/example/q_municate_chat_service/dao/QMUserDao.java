@@ -38,6 +38,6 @@ public interface QMUserDao {
     int delete(QMUser user);
 
     @Query("SELECT * FROM "+TABLE_NAME +" where id in (:userIds)")
-    Observable<List<QMUser>> getUsersByIDs(List<Integer> idsList);
+    List<QMUser> getUsersByIDs(List<Integer> userIds);
 
 }
