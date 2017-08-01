@@ -38,6 +38,7 @@ public class MainActivity extends BaseLoggableActivity {
 
     private ImportFriendsSuccessAction importFriendsSuccessAction;
     private ImportFriendsFailAction importFriendsFailAction;
+    private LoginChatAction loginChatAction;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -97,6 +98,7 @@ public class MainActivity extends BaseLoggableActivity {
         title = " " + AppSession.getSession().getUser().getFullName();
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
+        loginChatAction = new LoginChatAction();
         facebookHelper = new FacebookHelper(MainActivity.this);
     }
 
@@ -178,6 +180,7 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void addActions() {
+        addAction(Consts.EXTRA_LOGIN_ACTION, loginChatAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importFriendsSuccessAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importFriendsFailAction);
 
@@ -236,6 +239,16 @@ public class MainActivity extends BaseLoggableActivity {
         }
 
         hideProgress();
+    }
+
+    private class LoginChatAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+             /*if (bundle.getInt(Consts.EXTRA_LOGIN_RESULT) == 1){
+                 performLoginChatSuccessAction(bundle);
+             }*/
+        }
     }
 
     private class ImportFriendsSuccessAction implements Command {

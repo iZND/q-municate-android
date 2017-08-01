@@ -71,7 +71,7 @@ public class ServiceManager {
     private QMAuthService authService;
 
     @Inject
-    private QMUserRepository userRepository;
+    QMUserRepository userRepository;
 
     public static ServiceManager getInstance() {
         if (instance == null) {

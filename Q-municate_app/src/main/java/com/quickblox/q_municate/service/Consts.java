@@ -40,6 +40,7 @@ public interface Consts {
     String EXTRA_CONFERENCE_TYPE = "conference_type";
     String EXTRA_IS_INCOMING_CALL = "conversation_reason";
 
+    String EXTRA_LOGIN_ACTION = "login_action";
     String EXTRA_LOGIN_RESULT = "login_result";
     String EXTRA_LOGIN_ERROR_MESSAGE = "login_error_message";
     int EXTRA_LOGIN_RESULT_CODE = 1002;
@@ -50,8 +51,11 @@ public interface Consts {
     int COMMAND_NOT_FOUND = 0;
     int COMMAND_LOGIN = 1;
     int COMMAND_LOGOUT = 2;
+    int COMMAND_LIGHT_LOGIN = 3;
     String EXTRA_IS_STARTED_FOR_CALL = "isRunForCall";
     String ALREADY_LOGGED_IN = "You have already logged in chat";
+    String EXTRA_FULL_LOGIN = "extra_full_login";
+
 
     enum StartConversationReason {
         INCOME_CALL_FOR_ACCEPTION,

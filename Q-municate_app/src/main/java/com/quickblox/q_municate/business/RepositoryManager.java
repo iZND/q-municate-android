@@ -2,8 +2,11 @@ package com.quickblox.q_municate.business;
 
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.q_municate_chat_service.entity.user.QMUser;
 import com.example.q_municate_chat_service.repository.QBChatDilogRepositoryImpl;
 import com.example.q_municate_chat_service.repository.QMUserRepository;
 import com.quickblox.chat.model.QBChatDialog;
@@ -41,8 +44,15 @@ public class RepositoryManager {
                         new FinderUnknownUsers(AppSession.getSession().getUser(), qbChatDialogs);
                 Collection<Integer> integers = finderUnknownUsers.find();
                 List<Integer> userIds = new ArrayList<>(integers);
-                userRepository.loadByIds(userIds).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread()).subscribe();
+
+                LiveData<List<QMUser>> usersLiveData = userRepository.loadByIds(userIds);
+                final Observer<List<QMUser>> observer = new Observer<List<QMUser>>() {
+                    @Override
+                    public void onChanged(@Nullable List<QMUser> users) {
+                        usersLiveData.removeObserver(this);
+                    }
+                };
+                usersLiveData.observeForever(observer);
             });
 
 

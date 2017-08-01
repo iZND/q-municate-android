@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
+import android.databinding.DataBindingUtil;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +13,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.databinding.ItemDialogBinding;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
-import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate_core.models.DialogWrapper;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.Iterator;
 import java.util.List;
@@ -30,53 +27,28 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
 
-        //QBChatDialog dialogWrapper = getItem(position);
         QBChatDialog currentDialog = getItem(position);
 
         ItemDialogBinding binding;
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.item_dialog, null);
-
-            binding = ItemDialogBinding.inflate(layoutInflater, parent, false);
-            viewHolder = new ViewHolder(binding);
-
-            viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-            viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            viewHolder.lastMessageTextView = (TextView) convertView.findViewById(R.id.last_message_textview);
-            viewHolder.unreadMessagesTextView = (TextView) convertView.findViewById(
-                    R.id.unread_messages_textview);
-
-            convertView.setTag(viewHolder);
+            binding = DataBindingUtil.inflate(layoutInflater,R.layout.item_dialog, parent, false);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-            binding = viewHolder.binding;
-        }
-
-        if (QBDialogType.PRIVATE.equals(currentDialog.getDialogType())) {
-              //  viewHolder.nameTextView.setText(currentDialog.getName());
-            displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
-        } else {
-            //viewHolder.nameTextView.setText(currentDialog.getName());
-            viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
-            displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
+                // Recycling view
+            binding = DataBindingUtil.getBinding(convertView);
         }
 
         binding.setDialog(currentDialog);
         binding.executePendingBindings();
-        /*long totalCount = currentDialog.getUnreadMessageCount();
 
-        if (totalCount > ConstsCore.ZERO_INT_VALUE) {
-            viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
-            viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
+        if (QBDialogType.PRIVATE.equals(currentDialog.getDialogType())) {
+            displayGroupPhotoImage(currentDialog.getPhoto(), binding.avatarImageview);
         } else {
-            viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
+            binding.avatarImageview.setImageResource(R.drawable.placeholder_group);
+            displayGroupPhotoImage(currentDialog.getPhoto(), binding.avatarImageview);
         }
 
-        viewHolder.lastMessageTextView.setText(currentDialog.getLastMessage());*/
-
-        return convertView;
+        return binding.getRoot();
     }
 
    /* public void updateItem(DialogWrapper dlgWrapper) {
@@ -120,16 +92,4 @@ public class DialogsListAdapter extends BaseListAdapter<QBChatDialog> {
 
     }
 
-    private static class ViewHolder {
-
-        public RoundedImageView avatarImageView;
-        public TextView nameTextView;
-        public TextView lastMessageTextView;
-        public TextView unreadMessagesTextView;
-        public ItemDialogBinding binding;
-
-        ViewHolder(ItemDialogBinding binding){
-            this.binding = binding;
-        }
-    }
 }

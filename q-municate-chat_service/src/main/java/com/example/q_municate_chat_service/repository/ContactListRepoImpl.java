@@ -64,7 +64,7 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem> implements Ba
     }
 
     private void fetchFromNetwork(LiveData<List<ContactItem>> dbSource) {
-
+        Log.i(TAG, "fetchFromNetwork");
         final LiveData<List<ContactItem>> apiSource = createApiData();
         result.addSource(apiSource, new Observer<List<ContactItem>>() {
             @Override

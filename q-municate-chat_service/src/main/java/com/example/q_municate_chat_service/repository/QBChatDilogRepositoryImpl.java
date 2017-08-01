@@ -3,6 +3,7 @@ package com.example.q_municate_chat_service.repository;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -55,15 +56,18 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implem
     }
 
     private void fetchFromNetwork(LiveData<List<QBChatDialog>> dbSource) {
-
+        Log.i(TAG, "fetchFromNetwork");
         final LiveData<List<QBChatDialog>> apiSource = createApiData();
         result.addSource(apiSource, new Observer<List<QBChatDialog>>() {
             @Override
             public void onChanged(final @Nullable List<QBChatDialog> qbChatDialogs) {
+                Log.i(TAG, "onChanged from api request");
                 if (!CollectionsUtil.isEmpty(qbChatDialogs)) {
                     dbExecutor.execute(new Runnable() {
                         @Override
                         public void run() {
+                            Log.i(TAG, "chatDialogDao.insertAll");
+
                             chatDialogDao.insertAll(qbChatDialogs);
                         }
                     });
@@ -94,19 +98,29 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implem
         return CollectionsUtil.isEmpty(data);
     }
 
-    protected void performApiReuqest() {
-        QBRestChatService.getChatDialogs(null, null).
-                performAsync(new QBEntityCallback<ArrayList<QBChatDialog>>() {
-                    @Override
-                    public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
-                        result.setValue(qbChatDialogs);
-                    }
+    @NonNull
+    @Override
+    protected LiveData<List<QBChatDialog>> createApiData() {
+        return new LiveData<List<QBChatDialog>>() {
+            @Override
+            protected void onActive() {
+                QBRestChatService.getChatDialogs(null, null).
+                        performAsync(new QBEntityCallback<ArrayList<QBChatDialog>>() {
+                            @Override
+                            public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
+                                setValue(qbChatDialogs);
+                            }
 
-                    @Override
-                    public void onError(QBResponseException e) {
-                        result.setValue(null);
-                    }
-                });
+                            @Override
+                            public void onError(QBResponseException e) {
+                                setValue(null);
+                            }
+                        });
+            }
+        };
+    }
+
+    protected void performApiReuqest() {
 
     }
 }

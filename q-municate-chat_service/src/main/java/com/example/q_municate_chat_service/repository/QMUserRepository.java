@@ -19,7 +19,7 @@ public interface QMUserRepository {
 
     LiveData<QMUser> loadById(int id);
 
-    Observable<List<QMUser>> loadByIds(List<Integer> usersIds);
+    LiveData<List<QMUser>> loadByIds(List<Integer> usersIds);
 
     Completable update(QMUser event);
 

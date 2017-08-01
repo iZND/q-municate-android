@@ -42,8 +42,8 @@ public class ChatDialogModule {
     }
 
     @Provides
-    public QBMessageRepo createChatMessageRepo(QBMessageDao dialogDao){
-        return new QBMessageRepo(dialogDao);
+    public QBMessageRepo createChatMessageRepo(QBMessageDao messageDao){
+        return new QBMessageRepo(messageDao);
     }
 
     @Provides

@@ -157,6 +157,7 @@ public class App extends MultiDexApplication {
         QMUserService.init(userCache);
 
         ServiceManager.getInstance();
+        App.getInstance().getComponent().inject(ServiceManager.getInstance());
     }
 
     public synchronized SharedHelper getAppSharedHelper() {

@@ -2,6 +2,7 @@ package com.quickblox.q_municate.service;
 
 
 import android.app.Service;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
@@ -11,14 +12,18 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.example.q_municate_chat_service.entity.ContactItem;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.business.RepositoryManager;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
@@ -41,6 +46,7 @@ public class AndroidChatService extends Service {
     private int currentCommand;
     private QBUser currentUser;
     private Messenger messenger;
+    private List<QBChatDialog> chatDialogs;
 
     public static void login(Context context, QBUser qbUser, Messenger messenger) {
         Intent intent = new Intent(context, AndroidChatService.class);
@@ -52,8 +58,19 @@ public class AndroidChatService extends Service {
         context.startService(intent);
     }
 
+
+
     public static void login(Context context, QBUser qbUser) {
         login(context, qbUser, null);
+    }
+
+    public static void lightLogin(Context context, QBUser qbUser) {
+        Intent intent = new Intent(context, AndroidChatService.class);
+
+        intent.putExtra(Consts.EXTRA_COMMAND_TO_SERVICE, Consts.COMMAND_LIGHT_LOGIN);
+        intent.putExtra(Consts.EXTRA_QB_USER, qbUser);
+        intent.putExtra(Consts.EXTRA_FULL_LOGIN, false);
+        context.startService(intent);
     }
 
     @Override
@@ -71,7 +88,7 @@ public class AndroidChatService extends Service {
 
         parseIntentExtras(intent);
 
-        startSuitableActions();
+        startSuitableActions(intent);
 
         return START_REDELIVER_INTENT;
     }
@@ -84,9 +101,9 @@ public class AndroidChatService extends Service {
         }
     }
 
-    private void startSuitableActions() {
+    private void startSuitableActions(Intent intent) {
         if (currentCommand == Consts.COMMAND_LOGIN) {
-            startLoginToChat();
+            startLoginToChat(intent.getBooleanExtra(Consts.EXTRA_FULL_LOGIN, true));
         } else if (currentCommand == Consts.COMMAND_LOGOUT) {
             logout();
         }
@@ -104,20 +121,22 @@ public class AndroidChatService extends Service {
         }
     }
 
-    private void startLoginToChat() {
+    private void startLoginToChat(boolean fullLogin) {
         if (!chatService.isLoggedIn()) {
-            loginToChat(currentUser);
+            loginToChat(currentUser, fullLogin);
         } else {
             sendResultToActivity(true, null);
         }
     }
 
-    private void loginToChat(QBUser qbUser) {
+    private void loginToChat(QBUser qbUser, boolean fullLogin) {
         chatService.login(qbUser, new QBEntityCallback<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 Log.d(TAG, "login onSuccess");
-                loadContacts();
+                if (fullLogin) {
+                    loadContacts();
+                }
             }
 
             @Override
@@ -148,7 +167,7 @@ public class AndroidChatService extends Service {
                     @Override
                     public void onCompleted() {
                         Log.d(TAG, "loadContacts onCompleted" );
-                        startActionsOnSuccessLogin();
+                        startActionsOnSuccessLogin(true);
                     }
 
                     @Override
@@ -165,9 +184,31 @@ public class AndroidChatService extends Service {
         });
     }
 
-    private void startActionsOnSuccessLogin() {
+    public void loadDialogs(){
+        RepositoryManager repositoryManager = null;
+        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs();
+        listLiveData.observeForever((loadedChatDialogs) ->{
+
+            chatDialogs = loadedChatDialogs;
+            for (QBChatDialog qbChatDialog : chatDialogs) {
+                qbChatDialog.join(null, null);
+            }
+            listLiveData.removeObserver(this);
+            });
+
+    }
+
+    private void startActionsOnSuccessLogin(boolean success) {
         //initPingListener();
-        sendResultToActivity(true, null);
+        sendResultToActivity(success, null);
+    }
+
+    private void sendBroadcast(boolean success) {
+        Intent intent =new Intent(Consts.EXTRA_LOGIN_ACTION);
+        Bundle bundle = new Bundle();
+        bundle.putInt(Consts.EXTRA_LOGIN_RESULT, (success ? 1 : 0));
+        intent.putExtras(bundle);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void sendResultToActivity(boolean isSuccess, String errorMessage) {
@@ -182,6 +223,8 @@ public class AndroidChatService extends Service {
                         ? errorMessageSendingResult
                         : "Error sending result to activity");
             }
+        } else {
+            sendBroadcast(isSuccess);
         }
     }
 

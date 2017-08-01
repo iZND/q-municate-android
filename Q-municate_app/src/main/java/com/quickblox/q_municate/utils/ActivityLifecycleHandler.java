@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.q_municate.service.AndroidChatService;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
@@ -40,6 +41,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
                 boolean networkAvailable = ((BaseActivity) activity).isNetworkAvailable();
                 Log.d(TAG, "networkAvailable" + networkAvailable);
                 if (canLogin) {
+                    AndroidChatService.lightLogin(activity, AppSession.getSession().getUser());
                     //QBLoginChatCompositeCommand.start(activity);
                 }
             }
@@ -80,7 +82,8 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             }
             chatDestroyed = ((Loggable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
-                QBLogoutAndDestroyChatCommand.start(activity, true);
+                AndroidChatService.logout(activity);
+                //QBLogoutAndDestroyChatCommand.start(activity, true);
             }
         }
     }
