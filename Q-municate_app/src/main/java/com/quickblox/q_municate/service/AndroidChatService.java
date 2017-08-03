@@ -3,7 +3,6 @@ package com.quickblox.q_municate.service;
 
 import android.app.Service;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,29 +14,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.example.q_municate_chat_service.entity.ContactItem;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBPagedRequestBuilder;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.business.RepositoryManager;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_user_service.QMUserService;
-import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate.business.ChatDialogsManager;
+import com.quickblox.q_municate.utils.LiveDataUtils;
 import com.quickblox.users.model.QBUser;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import javax.inject.Inject;
 
 public class AndroidChatService extends Service {
 
@@ -47,6 +36,9 @@ public class AndroidChatService extends Service {
     private QBUser currentUser;
     private Messenger messenger;
     private List<QBChatDialog> chatDialogs;
+
+    @Inject
+    ChatDialogsManager repositoryManager;
 
     public static void login(Context context, QBUser qbUser, Messenger messenger) {
         Intent intent = new Intent(context, AndroidChatService.class);
@@ -73,10 +65,20 @@ public class AndroidChatService extends Service {
         context.startService(intent);
     }
 
+    public static void loadDialogs(Context context, int page){
+        Intent intent = new Intent(context, AndroidChatService.class);
+
+        intent.putExtra(Consts.EXTRA_COMMAND_TO_SERVICE, Consts.COMMAND_LOAD_DIALOGS);
+        intent.putExtra(Consts.EXTRA_PAGE, page);
+
+        context.startService(intent);
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
-
+        App.getInstance().getComponent().inject(this);
         createChatService();
 
         Log.d(TAG, "Service onCreate()");
@@ -106,6 +108,8 @@ public class AndroidChatService extends Service {
             startLoginToChat(intent.getBooleanExtra(Consts.EXTRA_FULL_LOGIN, true));
         } else if (currentCommand == Consts.COMMAND_LOGOUT) {
             logout();
+        } else if (currentCommand == Consts.COMMAND_LOAD_DIALOGS) {
+            loadDialogs(intent);
         }
     }
 
@@ -135,6 +139,11 @@ public class AndroidChatService extends Service {
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 Log.d(TAG, "login onSuccess");
                 if (fullLogin) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     loadContacts();
                 }
             }
@@ -150,51 +159,28 @@ public class AndroidChatService extends Service {
     }
 
     private void loadContacts() {
-        App.getInstance().getContactRepo().loadAll().observeForever(new Observer<List<ContactItem>>() {
-            @Override
-            public void onChanged(final @Nullable List<ContactItem> contactItemList) {
-                Collection<Integer> friendIdsList = new ArrayList<>(contactItemList.size());
-                for (ContactItem contactItem : contactItemList) {
-                    friendIdsList.add(contactItem.getUserId());
-                }
-                QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-                requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
-                requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-                QMUserService.getInstance().getUsersByIDs(friendIdsList, requestBuilder)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new rx.Observer<List<QMUser>>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.d(TAG, "loadContacts onCompleted" );
+
+        LiveDataUtils.observeValue(App.getInstance().getUserManager().loadUsersFromContactList(),
+                users -> {
+                    if (!CollectionsUtil.isEmpty(users)){
                         startActionsOnSuccessLogin(true);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d(TAG, "onError " );
-                    }
-
-                    @Override
-                    public void onNext(List<QMUser> qmUsers) {
-                        Log.d(TAG, "loadContacts onNext" );
+                    } else {
+                        Log.d(TAG, "onError load users from contact list" );
                     }
                 });
-            }
-        });
     }
 
-    public void loadDialogs(){
-        RepositoryManager repositoryManager = null;
-        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs();
-        listLiveData.observeForever((loadedChatDialogs) ->{
+    public void loadDialogs(Intent intent){
+        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs(true);
 
+        LiveDataUtils.observeValue(listLiveData, (loadedChatDialogs) -> {
             chatDialogs = loadedChatDialogs;
             for (QBChatDialog qbChatDialog : chatDialogs) {
                 qbChatDialog.join(null, null);
             }
-            listLiveData.removeObserver(this);
-            });
+            Bundle bundle = new Bundle();
+            sendBroadcast(bundle, Consts.EXTRA_LOAD_DIALOGS_ACTION);
+        });
 
     }
 
@@ -207,6 +193,12 @@ public class AndroidChatService extends Service {
         Intent intent =new Intent(Consts.EXTRA_LOGIN_ACTION);
         Bundle bundle = new Bundle();
         bundle.putInt(Consts.EXTRA_LOGIN_RESULT, (success ? 1 : 0));
+        intent.putExtras(bundle);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendBroadcast(Bundle bundle, String action) {
+        Intent intent =new Intent(action);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

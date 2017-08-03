@@ -1,18 +1,16 @@
 package com.quickblox.q_municate.di;
 
+import com.example.q_municate_chat_service.dao.ContactListDao;
 import com.example.q_municate_chat_service.dao.QMUserDao;
-import com.example.q_municate_chat_service.entity.user.QMUser;
+import com.example.q_municate_chat_service.repository.ContactListRepoImpl;
 import com.example.q_municate_chat_service.repository.QBChatDilogRepositoryImpl;
 import com.example.q_municate_chat_service.dao.QBChatDialogDao;
 import com.example.q_municate_chat_service.dao.QBMessageDao;
 import com.example.q_municate_chat_service.db.QbChatDialogDatabase;
-import com.example.q_municate_chat_service.entity.QBMessage;
-import com.example.q_municate_chat_service.repository.BaseRepo;
 import com.example.q_municate_chat_service.repository.QBMessageRepo;
 import com.example.q_municate_chat_service.repository.QMUserRepository;
 import com.example.q_municate_chat_service.repository.QMUserRepositoryImpl;
-import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.q_municate.business.RepositoryManager;
+import com.quickblox.q_municate.business.ChatDialogsManager;
 
 import dagger.Module;
 import dagger.Provides;
@@ -42,6 +40,11 @@ public class ChatDialogModule {
     }
 
     @Provides
+    public ContactListDao createContactListDao(){
+        return dialogDatabase.contatIlistDao();
+    }
+
+    @Provides
     public QBMessageRepo createChatMessageRepo(QBMessageDao messageDao){
         return new QBMessageRepo(messageDao);
     }
@@ -52,13 +55,18 @@ public class ChatDialogModule {
     }
 
     @Provides
+    public ContactListRepoImpl createContactListRepo(ContactListDao contactListDao){
+        return new ContactListRepoImpl(contactListDao);
+    }
+
+    @Provides
     public QMUserRepository createUserRepository(QMUserDao userDao){
         return new QMUserRepositoryImpl(userDao);
     }
 
     @Provides
-    public RepositoryManager createRepoManager(QBChatDilogRepositoryImpl dialogDao, QMUserRepository userRepository){
-        return new RepositoryManager(dialogDao, userRepository);
+    public ChatDialogsManager createRepoManager(QBChatDilogRepositoryImpl dialogDao, QMUserRepository userRepository){
+        return new ChatDialogsManager(dialogDao, userRepository);
     }
 
 

@@ -3,39 +3,18 @@ package com.quickblox.q_municate.ui.fragments.chats;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.example.q_municate_chat_service.QBChatDilogRepository;
-import com.example.q_municate_chat_service.entity.ContactItem;
-import com.example.q_municate_chat_service.repository.BaseRepo;
-import com.example.q_municate_chat_service.repository.QBChatDilogRepositoryImpl;
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.business.RepositoryManager;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_user_service.QMUserService;
-import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate.business.ChatDialogsManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
-
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
 
 public class QbChatDialogListViewModel extends ViewModel {
 
@@ -43,7 +22,7 @@ public class QbChatDialogListViewModel extends ViewModel {
     private LiveData<List<QBChatDialog>> dialogs = new MutableLiveData<>();
 
     @Inject
-    RepositoryManager repository;
+    ChatDialogsManager repository;
 
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
 
@@ -56,7 +35,7 @@ public class QbChatDialogListViewModel extends ViewModel {
     }
 
     public LiveData<List<QBChatDialog>> getDialogs() {
-        return repository.loadDialogs();
+        return repository.loadDialogs(false);
     }
 
     public void removeDialog(final QBChatDialog dialog){

@@ -48,12 +48,12 @@ public class DateConverter {
 
     @TypeConverter
     public static RosterPacket.ItemStatus fromStatus(String value) {
-        return RosterPacket.ItemStatus.valueOf(value);
+        return !TextUtils.isEmpty(value) ? RosterPacket.ItemStatus.valueOf(value) : null;
     }
 
     @TypeConverter
     public static String toStatus(RosterPacket.ItemStatus value) {
-        return value.toString();
+        return value!=null ? value.toString() :null;
     }
 
     @TypeConverter

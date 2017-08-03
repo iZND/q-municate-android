@@ -11,9 +11,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.digits.sdk.android.Digits;
 import com.example.q_municate_chat_service.QBChatDilogRepository;
 import com.example.q_municate_chat_service.db.QbChatDialogDatabase;
-import com.example.q_municate_chat_service.entity.ContactItem;
-import com.example.q_municate_chat_service.repository.BaseRepo;
-import com.example.q_municate_chat_service.repository.ContactListRepoImpl;
+import com.quickblox.q_municate.business.UserManager;
 import com.quickblox.q_municate.di.ChatDialogModule;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
@@ -48,7 +46,7 @@ public class App extends MultiDexApplication {
     private QbChatDialogDatabase chatDialgDb;
     private QBChatDilogRepository dilogRepository;
     private DIComponent diComponent;
-    private ContactListRepoImpl contactListRepo;
+    private UserManager userManager;
 
 
     public static App getInstance() {
@@ -140,11 +138,12 @@ public class App extends MultiDexApplication {
         return diComponent;
     }
 
-    public BaseRepo<ContactItem, Integer> getContactRepo(){
-        if (contactListRepo == null) {
-            contactListRepo = new ContactListRepoImpl(chatDialgDb.contatIlistDao());
+    public UserManager getUserManager(){
+        if (userManager == null) {
+            userManager = new UserManager();
+            App.getInstance().getComponent().inject(userManager);
         }
-        return contactListRepo;
+        return userManager;
     }
 
     private void initImageLoader(Context context) {

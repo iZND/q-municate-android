@@ -27,6 +27,7 @@ import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.loaders.DialogsListLoader;
+import com.quickblox.q_municate.service.Consts;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
@@ -215,7 +216,7 @@ public class DialogsListFragment extends BaseFragment {
         qbChatDialogListViewModel =
                 ViewModelProviders.of(this, factory).get(QbChatDialogListViewModel.class);
 
-        setupChanges(qbChatDialogListViewModel);
+        //setupChanges(qbChatDialogListViewModel);
 
     }
 
@@ -414,19 +415,13 @@ public class DialogsListFragment extends BaseFragment {
     }
 
     private void removeActions() {
-        baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
-        baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
-        baseActivity.removeAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION);
-        baseActivity.removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
+        baseActivity.removeAction(Consts.EXTRA_LOAD_DIALOGS_ACTION);
 
         baseActivity.updateBroadcastActionList();
     }
 
     private void addActions() {
-        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteDialogSuccessAction());
-        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
-        baseActivity.addAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, new UpdateDialogSuccessAction());
-
+        baseActivity.addAction(Consts.EXTRA_LOAD_DIALOGS_ACTION, new LoadDialogscActions());
         baseActivity.updateBroadcastActionList();
     }
 
@@ -484,6 +479,14 @@ public class DialogsListFragment extends BaseFragment {
             dialogsIdsToUpdate = new HashSet<>();
         }
         dialogsIdsToUpdate.add(dialogId);
+    }
+
+    private class LoadDialogscActions implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+            setupChanges(qbChatDialogListViewModel);
+        }
     }
 
     private class DeleteDialogSuccessAction implements Command {

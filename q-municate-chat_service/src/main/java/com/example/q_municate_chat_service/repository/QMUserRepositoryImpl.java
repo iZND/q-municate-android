@@ -56,7 +56,8 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
 
     @Override
     public LiveData<List<QMUser>> loadByIds(final List<Integer> usersIds) {
-        Log.i(TAG, "loadAll");
+        Log.i(TAG, "loadAll "+usersIds);
+        this.usersIds = usersIds;
         final LiveData<List<QMUser>> dbSource = userDao.getUsersByIDs(usersIds);
         result.addSource(dbSource,(users) -> {
                 Log.i(TAG, "onChanged from db source");

@@ -3,6 +3,8 @@ package com.example.q_municate_chat_service.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -10,8 +12,12 @@ import com.example.q_municate_chat_service.dao.ContactListDao;
 import com.example.q_municate_chat_service.entity.ContactItem;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBContactList;
+import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBContactListItem;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 
 import java.util.ArrayList;
@@ -32,7 +38,7 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem> implements Ba
 
         roster = QBChatService.getInstance().getRoster(QBContactList.SubscriptionMode.mutual,
                 new SubscriptionListener());
-        Log.i(TAG, "loading roster");
+        Log.i(TAG, "loading roster :loggedIn" + QBChatService.getInstance().isLoggedIn());
     }
 
     @Override
@@ -83,6 +89,23 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem> implements Ba
         });
     }
 
+    @NonNull
+    @Override
+    protected LiveData<List<ContactItem>> createApiData() {
+        return new LiveData<List<ContactItem>>() {
+            @Override
+            protected void onActive() {
+                Collection<QBContactListItem> entries = roster.getEntries();
+                Log.i(TAG, "performApiReuqest entries:"+roster.getEntries());
+                ArrayList<ContactItem> items = new ArrayList<>(entries.size());
+                for (QBContactListItem entry : entries) {
+                    items.add(new ContactItem(entry.getRosterEntry()));
+                }
+                setValue(items);
+            }
+        };
+    }
+
     @Override
     public LiveData<ContactItem> loadById(Integer integer) {
         return null;
@@ -95,14 +118,6 @@ public class ContactListRepoImpl extends BaseRepoImpl<ContactItem> implements Ba
 
     @Override
     protected void performApiReuqest() {
-
-        Collection<QBContactListItem> entries = roster.getEntries();
-        Log.i(TAG, "performApiReuqest entries:"+roster.getEntries());
-        ArrayList<ContactItem> items = new ArrayList<>(entries.size());
-        for (QBContactListItem entry : entries) {
-            items.add(new ContactItem(entry.getRosterEntry()));
-        }
-        result.postValue(items);
     }
 
     private class SubscriptionListener implements QBSubscriptionListener {

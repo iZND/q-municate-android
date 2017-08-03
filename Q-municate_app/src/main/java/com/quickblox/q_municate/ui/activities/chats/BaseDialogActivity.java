@@ -211,15 +211,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void setupChanges(QBChatMessageViewModel messagesViewModel){
-        messagesViewModel.getMessages(currentChatDialog.getDialogId()).observe(this,
-                new android.arch.lifecycle.Observer<List<QBMessage>>() {
-            @Override
-            public void onChanged(@Nullable List<QBMessage> messages) {
-                Log.i(TAG, "onChanged live data");
-                messagesAdapter.setList(messages, true);
-                afterLoadingMessagesActions();
-            }
-        });
+        messagesViewModel.loadDialogById(currentChatDialog.getDialogId()).observe(this,
+                (chatDialog) -> {
+                    Log.i(TAG, "onChanged live data");
+                    currentChatDialog = chatDialog;
+                    messagesViewModel.loadUsersInDialog(currentChatDialog).observe(
+                            BaseDialogActivity.this, (users) -> updateActionBar());
+                });
 
     }
 

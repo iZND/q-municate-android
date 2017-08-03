@@ -16,6 +16,7 @@ import android.view.View;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.service.AndroidChatService;
 import com.quickblox.q_municate.service.Consts;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
@@ -227,6 +228,7 @@ public class MainActivity extends BaseLoggableActivity {
     private void launchDialogsListFragment() {
         Log.d("MainActivity", "launchDialogsListFragment()");
         setCurrentFragment(DialogsListFragment.newInstance(),true);
+        AndroidChatService.loadDialogs(this, 1);
     }
 
     private void startImportFriends(){

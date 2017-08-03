@@ -5,8 +5,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.example.q_municate_chat_service.entity.QBMessage;
-import com.example.q_municate_chat_service.repository.QBMessageRepo;
+import com.example.q_municate_chat_service.entity.user.QMUser;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.business.ChatDialogsManager;
 import com.quickblox.q_municate.ui.fragments.chats.QbChatDialogListViewModel;
 
 import java.util.List;
@@ -22,7 +24,10 @@ public class QBChatMessageViewModel extends ViewModel {
     private LiveData<List<QBMessage>> messages = new MutableLiveData<>();
 
     @Inject
-    QBMessageRepo repository;
+    ChatDialogsManager dialogsManager;
+
+    QBChatDialog chatDialog;
+    List<QMUser> participants;
 
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
 
@@ -30,8 +35,12 @@ public class QBChatMessageViewModel extends ViewModel {
 
     }
 
-    public LiveData<List<QBMessage>> getMessages(String dlgId) {
-        return repository.loadAll(dlgId);
+    public LiveData<QBChatDialog> loadDialogById(String dlgId){
+        return dialogsManager.loadDialogById(dlgId);
+    }
+
+    public LiveData<List<QMUser>> loadUsersInDialog(QBChatDialog dialog){
+        return dialogsManager.loadUsersInDialog(dialog);
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {
