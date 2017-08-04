@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.example.q_municate_chat_service.dao.QMUserDao;
 import com.example.q_municate_chat_service.entity.user.QMUser;
+import com.example.q_municate_chat_service.util.RxUtils;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
@@ -55,7 +56,7 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
     }
 
     @Override
-    public LiveData<List<QMUser>> loadByIds(final List<Integer> usersIds) {
+    public LiveData<List<QMUser>> loadUsersByIds(final List<Integer> usersIds) {
         Log.i(TAG, "loadAll "+usersIds);
         this.usersIds = usersIds;
         final LiveData<List<QMUser>> dbSource = userDao.getUsersByIDs(usersIds);
@@ -69,6 +70,20 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
                 }
             });
         return result;
+    }
+
+    @Override
+    public Observable<List<QMUser>> loadByIds(final List<Integer> usersIds, boolean forceload) {
+        if (!forceload) {
+            return RxUtils.makeObservable(userDao.getByIDs(usersIds));
+        } else {
+            return RxUtils.makeObservable(QBUsers.getUsersByIDs(usersIds, null))
+                    .switchMap((qbUsers) -> {
+                            List<QMUser> users = QMUser.convertList(qbUsers);
+                            return Observable.just(users);
+                        });
+
+        }
     }
 
     private void fetchFromNetwork(LiveData<List<QMUser>> dbSource) {

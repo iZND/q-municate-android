@@ -10,6 +10,7 @@ import android.arch.persistence.room.Query;
 
 import com.example.q_municate_chat_service.entity.QBMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.q_municate_chat_service.entity.QBMessage.TABLE_NAME;
@@ -21,7 +22,7 @@ public interface QBMessageDao {
     LiveData<List<QBMessage>> getAll();
 
     @Query("SELECT * FROM "+TABLE_NAME +" where dialogId = :dialogId")
-    LiveData<List<QBMessage>> getAllByDialog(String dialogId);
+    List<QBMessage> getAllByDialog(String dialogId);
 
     @Query("SELECT * FROM "+TABLE_NAME +" where id = :msgId")
     LiveData<QBMessage> getById(int msgId);

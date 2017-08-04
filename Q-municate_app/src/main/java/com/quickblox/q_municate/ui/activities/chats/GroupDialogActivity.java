@@ -104,7 +104,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void updateActionBar() {
         if (isNetworkAvailable() && currentChatDialog != null) {
-            setActionBarTitle(ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager));
+            setActionBarTitle(currentChatDialog.getName());
             checkActionBarLogo(currentChatDialog.getPhoto(), R.drawable.placeholder_group);
         }
     }

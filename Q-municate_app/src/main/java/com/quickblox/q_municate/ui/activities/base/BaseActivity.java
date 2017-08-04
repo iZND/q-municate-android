@@ -686,7 +686,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void startPrivateChatActivity(QMUser user, QBChatDialog dialog) {
-        PrivateDialogActivity.start(this, user, dialog);
+        PrivateDialogActivity.start(this, null, dialog);
     }
 
     public void startGroupChatActivity(QBChatDialog chatDialog) {

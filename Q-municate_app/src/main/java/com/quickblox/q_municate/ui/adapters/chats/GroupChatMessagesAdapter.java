@@ -46,7 +46,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         }
 
         /*if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
-            updateMessageState(chatMessage, chatDialog);
+            updateMessageState(chatMessage, chatDialogData);
         }*/
     }
 

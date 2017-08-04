@@ -1,13 +1,11 @@
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 <data>
-<variable name="dialog" type="com.quickblox.chat.model.QBChatDialog"/>
+    <variable name="viewModel" type="com.quickblox.q_municate.ui.viewmodel.QBChatMessageViewModel"/>
 
-<import type="android.view.View" />
+    <import type="android.view.View" />
 </data>
-
-    />
 
 
 <LinearLayout
@@ -29,7 +27,8 @@
             android:id="@+id/messages_recycleview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical" />
+            android:scrollbars="vertical"
+            />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -42,3 +41,4 @@
         android:layout_height="250dp" />
 
 </LinearLayout>
+</layout>

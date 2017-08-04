@@ -214,7 +214,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
         QMUser occupant = ChatUtils.getOpponentFromPrivateDialog(
                 UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
         if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
-            PrivateDialogActivity.start(baseActivity, occupant, chatDialog);
+            PrivateDialogActivity.start(baseActivity, null, chatDialog);
         }
     }
 

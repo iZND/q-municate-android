@@ -190,7 +190,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     }
 
     private void startPrivateChat(QBChatDialog dialog) {
-        PrivateDialogActivity.start(this, selectedUser, dialog);
+        PrivateDialogActivity.start(this, null, dialog);
         finish();
     }
 

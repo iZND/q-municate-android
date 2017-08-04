@@ -40,4 +40,7 @@ public interface QMUserDao {
     @Query("SELECT * FROM "+TABLE_NAME +" where id in (:userIds)")
     LiveData<List<QMUser>> getUsersByIDs(List<Integer> userIds);
 
+    @Query("SELECT * FROM "+TABLE_NAME +" where id in (:userIds)")
+    List<QMUser> getByIDs(List<Integer> userIds);
+
 }

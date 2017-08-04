@@ -19,7 +19,9 @@ public interface QMUserRepository {
 
     LiveData<QMUser> loadById(int id);
 
-    LiveData<List<QMUser>> loadByIds(List<Integer> usersIds);
+    LiveData<List<QMUser>> loadUsersByIds(List<Integer> usersIds);
+
+    Observable<List<QMUser>> loadByIds(List<Integer> usersIds, boolean forceload);
 
     Completable update(QMUser event);
 

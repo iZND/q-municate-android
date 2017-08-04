@@ -161,7 +161,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<QBMessage> implem
         notifyItemRangeInserted(chatMessages.size() - collection.size(), chatMessages.size());
     }
 
-    public void setList(List <QBMessage> collection, boolean notifyDataChanged){
+    public void setList(List<QBMessage> collection, boolean notifyDataChanged){
         chatMessages = collection;
         if (notifyDataChanged) {
             this.notifyDataSetChanged();

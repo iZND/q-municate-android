@@ -1,13 +1,11 @@
 package com.quickblox.q_municate.business;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.util.Log;
 
 import com.example.q_municate_chat_service.entity.ContactItem;
 import com.example.q_municate_chat_service.entity.user.QMUser;
-import com.example.q_municate_chat_service.repository.ContactListRepo;
 import com.example.q_municate_chat_service.repository.ContactListRepoImpl;
 import com.example.q_municate_chat_service.repository.QMUserRepository;
 import com.quickblox.core.request.QBPagedRequestBuilder;
@@ -41,7 +39,7 @@ public class UserManager {
             QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
             requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
             requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-            return userRepository.loadByIds(friendIdsList);
+            return userRepository.loadUsersByIds(friendIdsList);
             });
     }
 }

@@ -12,6 +12,8 @@ import com.quickblox.chat.model.QBChatDialog;
 
 import java.util.List;
 
+import rx.Observable;
+
 @Dao
 public interface QBChatDialogDao {
 
@@ -19,7 +21,7 @@ public interface QBChatDialogDao {
     LiveData<List<QBChatDialog>> getAll();
 
     @Query("SELECT * FROM chat_dialogs where dialogId = :dialogId")
-    LiveData<QBChatDialog> getById(String dialogId);
+    QBChatDialog getById(String dialogId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<QBChatDialog> repositories);

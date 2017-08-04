@@ -127,7 +127,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
             QBChatDialog chatDialog = DialogTransformUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
-            PrivateDialogActivity.start(UserProfileActivity.this, user, chatDialog);
+            PrivateDialogActivity.start(UserProfileActivity.this, null, chatDialog);
         } else {
             showProgress();
             QBCreatePrivateChatCommand.start(this, user);
@@ -291,7 +291,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
     }
 
     private void startPrivateChat(QBChatDialog qbDialog) {
-        PrivateDialogActivity.start(UserProfileActivity.this, user, qbDialog);
+        PrivateDialogActivity.start(UserProfileActivity.this, null, qbDialog);
     }
 
     private boolean isUserFriendOrUserRequest() {

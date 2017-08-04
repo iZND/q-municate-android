@@ -78,7 +78,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         }
 
         /*if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
-            updateMessageState(chatMessage, chatDialog);
+            updateMessageState(chatMessage, chatDialogData);
         }*/
         // check if last messageCombination is request messageCombination
         boolean lastRequestMessage = (position == getItemCount() - 1 && friendsRequestMessage);

@@ -8,6 +8,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import java.util.List;
 
 import rx.Completable;
+import rx.Observable;
 
 public interface QBChatDialogRepository {
 
@@ -15,7 +16,7 @@ public interface QBChatDialogRepository {
 
     LiveData<List<QBChatDialog>> load(int pageNumber, int count);
 
-    LiveData<QBChatDialog> loadById(String id);
+    Observable<QBChatDialog> loadById(String id, boolean forceLoad);
 
     Completable delete(QBChatDialog event);
 

@@ -7,18 +7,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.q_municate_chat_service.QBChatDilogRepository;
 import com.example.q_municate_chat_service.dao.QBChatDialogDao;
+import com.example.q_municate_chat_service.util.RxUtils;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.extensions.RxJavaPerformProcessor;
+import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Completable;
+import rx.Observable;
+import rx.functions.Func0;
 
 public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implements QBChatDialogRepository{
 
@@ -78,8 +82,13 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implem
     }
 
     @Override
-    public LiveData<QBChatDialog> loadById(String id) {
-        return null;
+    public Observable<QBChatDialog> loadById(String id, boolean forceLoad) {
+        if (!forceLoad) {
+            return Observable.defer( () ->Observable.just(chatDialogDao.getById(id)));
+        } else {
+            return RxUtils.makeObservable(QBRestChatService.getChatDialogById(id));
+
+        }
     }
 
     @Override

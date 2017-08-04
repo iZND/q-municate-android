@@ -65,8 +65,8 @@ public class ChatDialogModule {
     }
 
     @Provides
-    public ChatDialogsManager createRepoManager(QBChatDilogRepositoryImpl dialogDao, QMUserRepository userRepository){
-        return new ChatDialogsManager(dialogDao, userRepository);
+    public ChatDialogsManager createRepoManager(QBChatDilogRepositoryImpl dialogDao, QMUserRepository userRepository, QBMessageRepo messageRepo){
+        return new ChatDialogsManager(dialogDao, userRepository, messageRepo);
     }
 
 

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.example.q_municate_chat_service.dao.QBMessageDao;
 import com.example.q_municate_chat_service.entity.QBMessage;
+import com.example.q_municate_chat_service.util.RxUtils;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
@@ -18,6 +19,9 @@ import com.quickblox.core.helper.CollectionsUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observable;
+import rx.functions.Func1;
 
 
 public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<QBMessage, String>{
@@ -41,9 +45,21 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
         return null;
     }
 
-    public LiveData<List<QBMessage>> loadAll(String dialogId) {
+    public Observable<ArrayList<QBMessage>> loadAll(String dialogId, boolean forceLoad) {
         Log.i(TAG, "loadAll dialogId="+dialogId);
-        this.dialogId = dialogId;
+        if (!forceLoad) {
+            return RxUtils.makeObservable( new ArrayList<>(messageDao.getAllByDialog(dialogId)));
+        } else {
+            QBChatDialog chatDialog = new QBChatDialog(dialogId);
+            return RxUtils.makeObservable(QBRestChatService.
+                    getDialogMessages(chatDialog, null))
+                    .switchMap( (qbChatMessages) -> {
+                                       ArrayList<QBMessage> messages = parseMessage(qbChatMessages);
+                                       return Observable.just(messages);
+                                   });
+
+        }
+       /* this.dialogId = dialogId;
         final LiveData<List<QBMessage>> dbSource = messageDao.getAllByDialog(dialogId);
         result.addSource(dbSource, new Observer<List<QBMessage>>() {
             @Override
@@ -60,7 +76,7 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
                 }
             }
         });
-        return result;
+        return result;*/
     }
 
     @Override

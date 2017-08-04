@@ -33,13 +33,13 @@ public class NotificationManagerHelper {
                 .getByDialogId(dialogId);
         QMUser user = QMUserService.getInstance().getUserCache().get((long) userId);
 
-        Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog + " user: " + user);
+        Log.d(TAG, "chatDialogData for oppeneng by push: " + chatDialog + " user: " + user);
 
         Intent intent = null;
         if (chatDialog != null && user != null) {
-            Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog);
+            Log.d(TAG, "chatDialogData for oppeneng by push: " + chatDialog);
             if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
-                intent = BaseDialogActivity.makePrivateDialogIntent(context, user, chatDialog);
+                intent = BaseDialogActivity.makePrivateDialogIntent(context, null, chatDialog);
             } else {
                 intent = BaseDialogActivity.makePGroupDialogIntent(context, chatDialog);
             }

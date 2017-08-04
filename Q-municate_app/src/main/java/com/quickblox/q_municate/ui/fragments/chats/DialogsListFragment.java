@@ -443,7 +443,7 @@ public class DialogsListFragment extends BaseFragment {
         }
 
         if (opponent != null && !TextUtils.isEmpty(chatDialog.getDialogId())) {
-            PrivateDialogActivity.startForResult(this, opponent, chatDialog, PICK_DIALOG);
+            PrivateDialogActivity.startForResult(this, null, chatDialog, PICK_DIALOG);
         }
     }
 
@@ -459,7 +459,7 @@ public class DialogsListFragment extends BaseFragment {
         qbChatDialogListViewModel.removeDialog(chatDialog);
         baseActivity.showProgress();
 
-        //QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId(), chatDialog.getType().getCode());
+        //QBDeleteChatCommand.start(baseActivity, chatDialogData.getDialogId(), chatDialogData.getType().getCode());
     }
 
     private void checkEmptyList(int listSize) {

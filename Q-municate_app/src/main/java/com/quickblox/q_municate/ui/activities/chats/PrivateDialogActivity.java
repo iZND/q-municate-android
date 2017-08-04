@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.q_municate_chat_service.entity.user.QMUser;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
@@ -32,7 +33,6 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_user_service.QMUserService;
-import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
@@ -84,9 +84,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateActionBar() {
-        setOnlineStatus(opponentUser);
+        setOnlineStatus(usersInDialog.get(0));
 
-        checkActionBarLogo(opponentUser.getAvatar(), R.drawable.placeholder_user);
+        checkActionBarLogo(usersInDialog.get(0).getAvatar(), R.drawable.placeholder_user);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void actualizeOpponentUserFromDb() {
-        QMUser opponentUserFromDb = QMUserService.getInstance().getUserCache().get((long) opponentUser.getId());
+        QMUser opponentUserFromDb = null;//QMUserService.getInstance().getUserCache().get((long) opponentUser.getId());
 
         if (opponentUserFromDb != null){
             opponentUser = opponentUserFromDb;
@@ -243,7 +243,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             return;
         }
         List<QBUser> qbUserList = new ArrayList<>(1);
-        qbUserList.add(UserFriendUtils.createQbUser(user));
+        qbUserList.add(UserFriendUtils.createQbUser(null));
         CallActivity.start(PrivateDialogActivity.this, qbUserList, qbConferenceType, null);
     }
 
@@ -277,7 +277,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void showRejectUserDialog(final int userId) {
-        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
+        QMUser user = null;//QMUserService.getInstance().getUserCache().get((long)userId);
         if (user == null) {
             return;
         }

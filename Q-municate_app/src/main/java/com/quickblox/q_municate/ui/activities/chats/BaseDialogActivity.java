@@ -5,13 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.databinding.ObservableList;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.q_municate_chat_service.entity.QBMessage;
+import com.example.q_municate_chat_service.entity.user.QMUser;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBAttachment;
@@ -35,7 +36,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
-import com.quickblox.q_municate.ui.fragments.chats.QbChatDialogListViewModel;
 import com.quickblox.q_municate.ui.viewmodel.QBChatMessageViewModel;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
@@ -68,7 +68,6 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
-import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
@@ -126,6 +125,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     ImageButton smilePanelImageButton;
 
     protected QBChatDialog currentChatDialog;
+
+    protected List<QMUser> usersInDialog;
+
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
@@ -202,7 +204,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             deleteTempMessagesAsync();
         }
 
-        QBChatMessageViewModel.Factory factory = new QBChatMessageViewModel.Factory();
+        QBChatMessageViewModel.Factory factory = new QBChatMessageViewModel.Factory(currentChatDialog.getDialogId());
         messagesViewModel =
                 ViewModelProviders.of(this, factory).get(QBChatMessageViewModel.class);
 
@@ -211,14 +213,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void setupChanges(QBChatMessageViewModel messagesViewModel){
-        messagesViewModel.loadDialogById(currentChatDialog.getDialogId()).observe(this,
-                (chatDialog) -> {
-                    Log.i(TAG, "onChanged live data");
-                    currentChatDialog = chatDialog;
-                    messagesViewModel.loadUsersInDialog(currentChatDialog).observe(
-                            BaseDialogActivity.this, (users) -> updateActionBar());
-                });
-
+        messagesViewModel.loadDialogById(currentChatDialog.getDialogId());
+        messagesViewModel.chatDialogData.addOnPropertyChangedCallback(new android.databinding.Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(android.databinding.Observable observable, int i) {
+                Log.i(TAG, "chatDialogData changed");
+                currentChatDialog = messagesViewModel.chatDialogData.get().first;
+                usersInDialog = messagesViewModel.chatDialogData.get().second;
+                updateActionBar();
+                messagesViewModel.loadMessages();
+            }
+        });
+        messagesViewModel.chatMessages.addOnListChangedCallback(new MessageListChangedCallback());
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -764,6 +770,36 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected abstract void checkMessageSendingPossibility();
+
+    private class MessageListChangedCallback extends ObservableList.OnListChangedCallback<ObservableList<QBMessage>> {
+        @Override
+        public void onChanged(ObservableList<QBMessage> qbMessages) {
+            Log.i(TAG, "onChanged "+qbMessages);
+            messagesAdapter.setList(qbMessages, true);
+        }
+
+        @Override
+        public void onItemRangeChanged(ObservableList<QBMessage> qbMessages, int i, int i1) {
+            Log.i(TAG, "onItemRangeChanged "+qbMessages);
+        }
+
+        @Override
+        public void onItemRangeInserted(ObservableList<QBMessage> qbMessages, int i, int i1) {
+            Log.i(TAG, "onItemRangeInserted "+qbMessages);
+            messagesAdapter.setList(qbMessages, true);
+        }
+
+        @Override
+        public void onItemRangeMoved(ObservableList<QBMessage> qbMessages, int i, int i1, int i2) {
+            Log.i(TAG, "onItemRangeMoved "+qbMessages);
+        }
+
+        @Override
+        public void onItemRangeRemoved(ObservableList<QBMessage> qbMessages, int i, int i1) {
+            Log.i(TAG, "onItemRangeRemoved "+qbMessages);
+        }
+
+    }
 
     private class MessageObserver implements Observer {
 
