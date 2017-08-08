@@ -168,6 +168,12 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
+    protected void startMainActivityOnLogin() {
+        MainActivity.start(BaseAuthActivity.this, true);
+        finish();
+    }
+
+
     protected void login(String userEmail, final String userPassword) {
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
@@ -199,8 +205,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
-    private void performLoginSuccessAction(QBUser user) {
-        startMainActivity(user);
+    protected void performLoginSuccessAction(QBUser user) {
+        Log.d(TAG, "performLoginSuccessAction ");
 
         // send analytics data
         GoogleAnalyticsHelper.pushAnalyticsData(this, user, "User Sign In");

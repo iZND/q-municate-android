@@ -16,7 +16,7 @@ public interface QBChatDialogRepository {
 
     LiveData<List<QBChatDialog>> load(int pageNumber, int count);
 
-    Observable<QBChatDialog> loadById(String id, boolean forceLoad);
+    LiveData<QBChatDialog> loadById(String id, boolean forceLoad);
 
     Completable delete(QBChatDialog event);
 

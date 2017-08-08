@@ -82,13 +82,36 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implem
     }
 
     @Override
-    public Observable<QBChatDialog> loadById(String id, boolean forceLoad) {
+    public LiveData<QBChatDialog> loadById(String id, boolean forceLoad) {
         if (!forceLoad) {
+            return chatDialogDao.getById(id);
+        } else {
+            return new LiveData<QBChatDialog>() {
+                @Override
+                protected void onActive() {
+                    QBRestChatService.getChatDialogById(id).
+                            performAsync(new QBEntityCallback<QBChatDialog>() {
+                                @Override
+                                public void onSuccess(QBChatDialog dialog, Bundle bundle) {
+                                    setValue(dialog);
+                                }
+
+                                @Override
+                                public void onError(QBResponseException e) {
+                                    setValue(null);
+                                }
+                            });
+                }
+            };
+        }
+
+
+      /*  if (!forceLoad) {
             return Observable.defer( () ->Observable.just(chatDialogDao.getById(id)));
         } else {
             return RxUtils.makeObservable(QBRestChatService.getChatDialogById(id));
 
-        }
+        }*/
     }
 
     @Override

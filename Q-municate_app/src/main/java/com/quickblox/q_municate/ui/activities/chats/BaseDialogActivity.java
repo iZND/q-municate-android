@@ -209,22 +209,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 ViewModelProviders.of(this, factory).get(QBChatMessageViewModel.class);
 
         setupChanges(messagesViewModel);
-
     }
 
     private void setupChanges(QBChatMessageViewModel messagesViewModel){
-        messagesViewModel.loadDialogById(currentChatDialog.getDialogId());
-        messagesViewModel.chatDialogData.addOnPropertyChangedCallback(new android.databinding.Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(android.databinding.Observable observable, int i) {
-                Log.i(TAG, "chatDialogData changed");
-                currentChatDialog = messagesViewModel.chatDialogData.get().first;
-                usersInDialog = messagesViewModel.chatDialogData.get().second;
-                updateActionBar();
-                messagesViewModel.loadMessages();
-            }
+        messagesViewModel.participants.observe(this, (users) -> {
+            usersInDialog = users;
+            updateActionBar();
+        } );
+        messagesViewModel.chatMessages.observe(this, (messages) -> {
+           messagesAdapter.setList(messages, true);
         });
-        messagesViewModel.chatMessages.addOnListChangedCallback(new MessageListChangedCallback());
+
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -273,16 +268,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onStart();
         addChatMessagesAdapterListeners();
         checkPermissionSaveFiles();
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         restoreDefaultCanPerformLogout();
-
-        //loadNextPartMessagesAsync();
-
         checkMessageSendingPossibility();
     }
 

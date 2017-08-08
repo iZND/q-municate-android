@@ -56,16 +56,21 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
     }
 
     @Override
-    public LiveData<List<QMUser>> loadUsersByIds(final List<Integer> usersIds) {
+    public LiveData<List<QMUser>> loadUsersByIds(final List<Integer> usersIds, boolean forceload) {
         Log.i(TAG, "loadAll "+usersIds);
         this.usersIds = usersIds;
         final LiveData<List<QMUser>> dbSource = userDao.getUsersByIDs(usersIds);
+        if (!forceload) {
+            return dbSource;
+        }
         result.addSource(dbSource,(users) -> {
                 Log.i(TAG, "onChanged from db source");
                 if (shouldFetch(users)) {
+                    Log.i(TAG, "users shouldFetch");
                     result.removeSource(dbSource);
                     fetchFromNetwork(dbSource);
                 } else {
+                    Log.i(TAG, "return users from db");
                     result.setValue(users);
                 }
             });
@@ -73,15 +78,15 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
     }
 
     @Override
-    public Observable<List<QMUser>> loadByIds(final List<Integer> usersIds, boolean forceload) {
+    public LiveData<List<QMUser>> loadByIds(final List<Integer> usersIds, boolean forceload) {
         if (!forceload) {
-            return RxUtils.makeObservable(userDao.getByIDs(usersIds));
+            return userDao.getUsersByIDs(usersIds);
         } else {
-            return RxUtils.makeObservable(QBUsers.getUsersByIDs(usersIds, null))
+            return null;/*RxUtils.makeObservable(QBUsers.getUsersByIDs(usersIds, null))
                     .switchMap((qbUsers) -> {
                             List<QMUser> users = QMUser.convertList(qbUsers);
                             return Observable.just(users);
-                        });
+                        })*/
 
         }
     }

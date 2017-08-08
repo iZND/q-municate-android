@@ -34,6 +34,7 @@ import com.quickblox.q_municate_core.utils.Utils;
 public class MainActivity extends BaseLoggableActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String FIRST_LOGIN = "first_login";
 
     private FacebookHelper facebookHelper;
 
@@ -44,6 +45,13 @@ public class MainActivity extends BaseLoggableActivity {
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, boolean firstLogin) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra(FIRST_LOGIN, firstLogin);
         context.startActivity(intent);
     }
 
@@ -69,9 +77,15 @@ public class MainActivity extends BaseLoggableActivity {
         initFields();
         setUpActionBarWithUpButton();
 
+        boolean isFisrtLogin = getIntent().getBooleanExtra(FIRST_LOGIN, false);
+
         if (!isChatInitializedAndUserLoggedIn()) {
             Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
+        } else {
+            if (getSupportFragmentManager().findFragmentById(R.id.container_fragment) == null && isFisrtLogin) {
+                launchDialogsListFragment();
+            }
         }
 
         addDialogsAction();
@@ -247,9 +261,10 @@ public class MainActivity extends BaseLoggableActivity {
 
         @Override
         public void execute(Bundle bundle) throws Exception {
-             /*if (bundle.getInt(Consts.EXTRA_LOGIN_RESULT) == 1){
+            Log.i(TAG, "LoginChatAction");
+             if (bundle.getInt(Consts.EXTRA_LOGIN_RESULT) == 1){
                  performLoginChatSuccessAction(bundle);
-             }*/
+             }
         }
     }
 

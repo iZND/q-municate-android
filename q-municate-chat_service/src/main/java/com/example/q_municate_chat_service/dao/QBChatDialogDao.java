@@ -21,7 +21,7 @@ public interface QBChatDialogDao {
     LiveData<List<QBChatDialog>> getAll();
 
     @Query("SELECT * FROM chat_dialogs where dialogId = :dialogId")
-    QBChatDialog getById(String dialogId);
+    LiveData<QBChatDialog> getById(String dialogId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<QBChatDialog> repositories);

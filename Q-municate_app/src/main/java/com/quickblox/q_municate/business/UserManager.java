@@ -8,7 +8,9 @@ import com.example.q_municate_chat_service.entity.ContactItem;
 import com.example.q_municate_chat_service.entity.user.QMUser;
 import com.example.q_municate_chat_service.repository.ContactListRepoImpl;
 import com.example.q_municate_chat_service.repository.QMUserRepository;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.request.QBPagedRequestBuilder;
+import com.quickblox.q_municate.utils.livedata.AbsentLiveData;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
@@ -31,6 +33,9 @@ public class UserManager {
 
     public LiveData<List<QMUser>> loadUsersFromContactList(){
         return Transformations.switchMap(contactListRepo.loadAll(), (contactItemList) -> {
+            if (CollectionsUtil.isEmpty(contactItemList)) {
+                return AbsentLiveData.create();
+            }
             Log.i(TAG, "loadUsersFromContactList + " + contactItemList);
             List<Integer> friendIdsList = new ArrayList<>(contactItemList.size());
             for (ContactItem contactItem : contactItemList) {
@@ -39,7 +44,7 @@ public class UserManager {
             QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
             requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
             requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-            return userRepository.loadUsersByIds(friendIdsList);
+            return userRepository.loadUsersByIds(friendIdsList, true);
             });
     }
 }

@@ -20,6 +20,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableField;
 import android.databinding.ObservableList;
+import android.util.Log;
 import android.util.Pair;
 
 import javax.inject.Inject;
@@ -38,19 +39,27 @@ public class QBChatMessageViewModel extends ViewModel {
     public final ObservableField<Pair<QBChatDialog, List<QMUser>>> chatDialogData =
             new ObservableField<>();
 
-    List<QMUser> participants;
+    public LiveData<List<QMUser>> participants;
 
-    public ObservableList<QBMessage> chatMessages = new ObservableArrayList<>();
+    public LiveData<List<QBMessage>> chatMessages;
 
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
     private String dlgId;
+
 
     public QBChatMessageViewModel(String dlgId){
         this.dlgId = dlgId;
     }
 
+    private void init() {
+        loadDialogById(dlgId);
+        loadMessages();
+    }
+
     public void loadDialogById(String dlgId){
-        dialogsManager.loadDialogData(dlgId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        participants = dialogsManager.loadDialogData(dlgId);
+
+        /*dialogsManager.loadDialogData(dlgId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new rx.Observer<Pair<QBChatDialog, List<QMUser>>>() {
                     @Override
                     public void onCompleted() {
@@ -66,11 +75,13 @@ public class QBChatMessageViewModel extends ViewModel {
                     public void onNext(Pair<QBChatDialog, List<QMUser>> dialogData) {
                         chatDialogData.set(dialogData);
                     }
-                });;
+                });;*/
     }
 
     public void loadMessages(){
-        dialogsManager.loadMessages(dlgId, true)
+        Log.i(TAG, "load messages");
+        chatMessages = dialogsManager.loadMessages(dlgId, true);
+        /*dlgId, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<ArrayList<QBMessage>>() {
             @Override
@@ -87,7 +98,7 @@ public class QBChatMessageViewModel extends ViewModel {
             public void onNext(ArrayList<QBMessage> qbMessages) {
                 chatMessages.addAll(qbMessages);
             }
-        });
+        });*/
     }
 
     public LiveData<List<QMUser>> loadUsersInDialog(QBChatDialog dialog){
@@ -106,7 +117,10 @@ public class QBChatMessageViewModel extends ViewModel {
         public <T extends ViewModel> T create(Class<T> modelClass) {
             QBChatMessageViewModel qbChatMessageViewModel = new QBChatMessageViewModel(dlgId);
             App.getInstance().getComponent().inject(qbChatMessageViewModel);
+            qbChatMessageViewModel.init();
             return (T) qbChatMessageViewModel;
         }
     }
+
+
 }

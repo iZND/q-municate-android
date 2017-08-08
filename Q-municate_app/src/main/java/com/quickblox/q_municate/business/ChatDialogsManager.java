@@ -3,9 +3,9 @@ package com.quickblox.q_municate.business;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.Pair;
 
 import com.example.q_municate_chat_service.entity.QBMessage;
 import com.example.q_municate_chat_service.entity.user.QMUser;
@@ -54,7 +54,7 @@ public class ChatDialogsManager {
                 Collection<Integer> integers = finderUnknownUsers.find();
                 List<Integer> userIds = new ArrayList<>(integers);
 
-                LiveData<List<QMUser>> usersLiveData = userRepository.loadUsersByIds(userIds);
+                LiveData<List<QMUser>> usersLiveData = userRepository.loadUsersByIds(userIds, true);
                 final Observer<List<QMUser>> observer = new Observer<List<QMUser>>() {
                     @Override
                     public void onChanged(@Nullable List<QMUser> users) {
@@ -69,13 +69,18 @@ public class ChatDialogsManager {
         return listLiveData;
     }
 
-    public Observable<Pair<QBChatDialog, List<QMUser>>> loadDialogData(String dlgId){
-        return chatDialogRepo.loadById(dlgId, false).flatMap(dialog -> {
+    public LiveData<List<QMUser>> loadDialogData(String dlgId){
+        return Transformations.switchMap(chatDialogRepo.loadById(dlgId, false),
+                 (dialog) -> {
+                return userRepository.loadUsersByIds(dialog.getOccupants(), false);
+            }
+        );
+        /*}) chatDialogRepo.loadById(dlgId, false).flatMap(dialog -> {
             return userRepository.loadByIds(dialog.getOccupants(), false);
         }, (dialog, users) -> {
             Pair<QBChatDialog, List<QMUser>> dialogListPair = new Pair<>(dialog, users);
             return dialogListPair;
-        });
+        });*/
 
     }
 
@@ -87,7 +92,7 @@ public class ChatDialogsManager {
 
     }
 
-    public Observable<ArrayList<QBMessage>> loadMessages(String dlgId, boolean forceLoad) {
+    public LiveData<List<QBMessage>> loadMessages(String dlgId, boolean forceLoad) {
         return messageRepo.loadAll(dlgId, forceLoad);
     }
 }

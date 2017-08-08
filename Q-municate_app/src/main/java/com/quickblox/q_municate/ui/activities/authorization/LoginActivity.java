@@ -3,12 +3,18 @@ package com.quickblox.q_municate.ui.activities.authorization;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.service.AndroidChatService;
+import com.quickblox.q_municate.service.Consts;
 import com.quickblox.q_municate.ui.activities.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
@@ -16,12 +22,15 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.users.model.QBUser;
 
 import butterknife.BindView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 public class LoginActivity extends BaseAuthActivity {
+
+    private static final String TAG = LoginActivity.class.getSimpleName();
 
     @BindView(R.id.remember_me_switch)
     SwitchCompat rememberMeSwitch;
@@ -37,6 +46,30 @@ public class LoginActivity extends BaseAuthActivity {
     }
 
     @Override
+    protected void performLoginSuccessAction(QBUser user) {
+        super.performLoginSuccessAction(user);
+        loginChat();
+    }
+
+    @Override
+    protected Messenger getMessenger() {
+        return new Messenger(new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case Consts.EXTRA_LOGIN_RESULT_CODE:
+                        Log.i(TAG, "messenger EXTRA_LOGIN_RESULT_CODE");
+                        startMainActivityOnLogin();
+                        break;
+                    default:
+                        super.handleMessage(msg);
+
+                }
+            }
+        });
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initFields(savedInstanceState);
@@ -49,6 +82,7 @@ public class LoginActivity extends BaseAuthActivity {
             login();
         }
     }
+
 
     @OnClick(R.id.facebook_connect_button)
     void loginFB(View view) {

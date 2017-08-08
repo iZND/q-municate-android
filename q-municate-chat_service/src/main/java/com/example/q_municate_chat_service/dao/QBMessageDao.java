@@ -22,7 +22,7 @@ public interface QBMessageDao {
     LiveData<List<QBMessage>> getAll();
 
     @Query("SELECT * FROM "+TABLE_NAME +" where dialogId = :dialogId")
-    List<QBMessage> getAllByDialog(String dialogId);
+    LiveData<List<QBMessage>> getAllByDialog(String dialogId);
 
     @Query("SELECT * FROM "+TABLE_NAME +" where id = :msgId")
     LiveData<QBMessage> getById(int msgId);

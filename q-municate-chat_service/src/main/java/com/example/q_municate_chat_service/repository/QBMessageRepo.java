@@ -45,9 +45,9 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
         return null;
     }
 
-    public Observable<ArrayList<QBMessage>> loadAll(String dialogId, boolean forceLoad) {
+    public LiveData<List<QBMessage>> loadAll(String dialogId, boolean forceLoad) {
         Log.i(TAG, "loadAll dialogId="+dialogId);
-        if (!forceLoad) {
+        /*if (!forceLoad) {
             return RxUtils.makeObservable( new ArrayList<>(messageDao.getAllByDialog(dialogId)));
         } else {
             QBChatDialog chatDialog = new QBChatDialog(dialogId);
@@ -58,9 +58,13 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
                                        return Observable.just(messages);
                                    });
 
-        }
-       /* this.dialogId = dialogId;
+        }*/
+        this.dialogId = dialogId;
         final LiveData<List<QBMessage>> dbSource = messageDao.getAllByDialog(dialogId);
+        if (!forceLoad) {
+            Log.i(TAG, "return result from db");
+            return dbSource;
+        }
         result.addSource(dbSource, new Observer<List<QBMessage>>() {
             @Override
             public void onChanged(@Nullable List<QBMessage> data) {
@@ -76,7 +80,7 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
                 }
             }
         });
-        return result;*/
+        return result;
     }
 
     @Override
