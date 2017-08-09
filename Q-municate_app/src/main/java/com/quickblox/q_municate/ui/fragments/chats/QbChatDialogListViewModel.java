@@ -35,7 +35,7 @@ public class QbChatDialogListViewModel extends ViewModel {
     }
 
     public LiveData<List<QBChatDialog>> getDialogs() {
-        return repository.loadDialogs(false);
+        return repository.loadDialogs(1, false);
     }
 
     public void removeDialog(final QBChatDialog dialog){

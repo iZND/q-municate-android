@@ -22,6 +22,7 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.core.helper.FileHelper;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.business.ChatDialogsManager;
 import com.quickblox.q_municate.utils.LiveDataUtils;
@@ -52,6 +53,7 @@ public class AndroidChatService extends Service {
     private ExecutorService executorService;
 
     private Handler handler = new Handler(Looper.getMainLooper());
+    private int pageunmber = 1;
 
     public static void login(Context context, QBUser qbUser, Messenger messenger) {
         Intent intent = new Intent(context, AndroidChatService.class);
@@ -196,7 +198,7 @@ public class AndroidChatService extends Service {
     }
 
     public void loadDialogs(Intent intent){
-        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs(true);
+        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs(pageunmber, true);
 
         handler.post( () -> {
             LiveDataUtils.observeValue(listLiveData, (loadedChatDialogs) -> {
@@ -206,6 +208,9 @@ public class AndroidChatService extends Service {
                     qbChatDialog.join(null, null);
                 }
                 Bundle bundle = new Bundle();
+                if (loadedChatDialogs.size() == 100) {
+                    loadDialogs(null);
+                }
                 sendBroadcast(bundle, Consts.EXTRA_LOAD_DIALOGS_ACTION);
             });
         });

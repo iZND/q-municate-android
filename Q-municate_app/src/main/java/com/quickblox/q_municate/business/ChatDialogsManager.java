@@ -33,6 +33,7 @@ public class ChatDialogsManager {
 
     private QBMessageRepo messageRepo;
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
+    private int pageNumber = 0;
 
     public ChatDialogsManager(QBChatDilogRepositoryImpl chatDialogRepo, QMUserRepository userRepository
                             ,QBMessageRepo messageRepo){
@@ -41,7 +42,35 @@ public class ChatDialogsManager {
         this.messageRepo = messageRepo;
     }
 
-    public LiveData<List<QBChatDialog>> loadDialogs(boolean forceLoad) {
+    public LiveData<List<QBChatDialog>> loadDialogs(int pageNumber, boolean forceLoad) {
+        LiveData<List<QBChatDialog>> listLiveData = chatDialogRepo.load(pageNumber, 100);
+        if (!forceLoad){
+            return listLiveData;
+        }
+        listLiveData.observeForever(qbChatDialogs -> {
+            ioExecuotr.execute(() -> {
+                Log.i(TAG, "findunknown users");
+                FinderUnknownUsers finderUnknownUsers =
+                        new FinderUnknownUsers(AppSession.getSession().getUser(), qbChatDialogs);
+                Collection<Integer> integers = finderUnknownUsers.find();
+                List<Integer> userIds = new ArrayList<>(integers);
+
+                LiveData<List<QMUser>> usersLiveData = userRepository.loadUsersByIds(userIds, true);
+                final Observer<List<QMUser>> observer = new Observer<List<QMUser>>() {
+                    @Override
+                    public void onChanged(@Nullable List<QMUser> users) {
+                        usersLiveData.removeObserver(this);
+                    }
+                };
+                usersLiveData.observeForever(observer);
+            });
+
+
+        });
+        return listLiveData;
+    }
+
+    public LiveData<List<QBChatDialog>> loadNextDialogs(boolean forceLoad) {
         LiveData<List<QBChatDialog>> listLiveData = chatDialogRepo.load(1, 100);
         if (!forceLoad){
             return listLiveData;
