@@ -12,6 +12,8 @@ import com.example.q_municate_chat_service.repository.QMUserRepository;
 import com.example.q_municate_chat_service.repository.QMUserRepositoryImpl;
 import com.quickblox.q_municate.business.ChatDialogsManager;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -64,6 +66,7 @@ public class ChatDialogModule {
         return new QMUserRepositoryImpl(userDao);
     }
 
+    @Singleton
     @Provides
     public ChatDialogsManager createRepoManager(QBChatDilogRepositoryImpl dialogDao, QMUserRepository userRepository, QBMessageRepo messageRepo){
         return new ChatDialogsManager(dialogDao, userRepository, messageRepo);

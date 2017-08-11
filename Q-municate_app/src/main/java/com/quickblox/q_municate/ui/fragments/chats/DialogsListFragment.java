@@ -29,6 +29,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.loaders.DialogsListLoader;
 import com.quickblox.q_municate.service.Consts;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
@@ -216,11 +217,12 @@ public class DialogsListFragment extends BaseFragment {
         qbChatDialogListViewModel =
                 ViewModelProviders.of(this, factory).get(QbChatDialogListViewModel.class);
 
-        //setupChanges(qbChatDialogListViewModel);
+        setupChanges(qbChatDialogListViewModel);
 
     }
 
     private void setupChanges(QbChatDialogListViewModel chatDialogListViewModel){
+        chatDialogListViewModel.setChatConnectionProvider(((BaseLoggableActivity)getActivity()).getChatProvider());
         chatDialogListViewModel.getDialogs().observe(this, new android.arch.lifecycle.Observer<List<QBChatDialog>>() {
             @Override
             public void onChanged(@Nullable List<QBChatDialog> qbChatDialogs) {

@@ -1,9 +1,14 @@
 package com.quickblox.q_municate.ui.activities.base;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
+import com.quickblox.q_municate.chat.ChatConnectionProvider;
+import com.quickblox.q_municate.service.AndroidChatService;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.Loggable;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -15,6 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class BaseLoggableActivity extends BaseActivity implements Loggable {
 
     public AtomicBoolean canPerformLogout = new AtomicBoolean(true);
+
+    protected ServiceConnection chatServiceConnection;
+    protected ChatConnectionProvider chatConnectionProvider;
 
     @Override
     protected void onRestart() {
@@ -28,6 +36,10 @@ public abstract class BaseLoggableActivity extends BaseActivity implements Logga
         super.onAttachFragment(fragment);
     }
 
+    public ChatConnectionProvider getChatProvider(){
+        return chatConnectionProvider;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +48,19 @@ public abstract class BaseLoggableActivity extends BaseActivity implements Logga
         if (savedInstanceState != null && savedInstanceState.containsKey(CAN_PERFORM_LOGOUT)) {
             canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
         }
+        chatServiceConnection = new ChatServiceConnection();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        connectToService(AndroidChatService.class, chatServiceConnection);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(chatServiceConnection);
     }
 
     @Override
@@ -59,5 +84,23 @@ public abstract class BaseLoggableActivity extends BaseActivity implements Logga
     protected boolean isCurrentSessionValid() {
         return AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES));
+    }
+
+    protected void onChatServiceBound() {
+
+    }
+
+    class ChatServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            chatConnectionProvider = ((AndroidChatService.ChatServiceBinder)service).getConnectionProvider();
+            onChatServiceBound();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            chatConnectionProvider = null;
+        }
     }
 }

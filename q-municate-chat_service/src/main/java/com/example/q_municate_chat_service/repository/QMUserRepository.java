@@ -27,4 +27,6 @@ public interface QMUserRepository {
 
     Completable save(QMUser user);
 
+    void clear();
+
 }

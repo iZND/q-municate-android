@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 
 
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.core.model.QBEntityPaged;
 
 import java.util.List;
 
@@ -29,5 +30,6 @@ public interface QBChatDialogDao {
     @Delete
     void delete(QBChatDialog dialogModel);
 
-
+    @Query("DELETE FROM chat_dialogs")
+    void clear();
 }

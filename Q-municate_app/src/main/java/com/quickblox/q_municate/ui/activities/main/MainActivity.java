@@ -79,14 +79,14 @@ public class MainActivity extends BaseLoggableActivity {
 
         boolean isFisrtLogin = getIntent().getBooleanExtra(FIRST_LOGIN, false);
 
-        if (!isChatInitializedAndUserLoggedIn()) {
+        /*if (!isChatInitializedAndUserLoggedIn()) {
             Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
-        } else {
-            if (getSupportFragmentManager().findFragmentById(R.id.container_fragment) == null && isFisrtLogin) {
+        } else {*/
+           /* if (getSupportFragmentManager().findFragmentById(R.id.container_fragment) == null && isFisrtLogin) {
                 launchDialogsListFragment();
-            }
-        }
+            }*/
+        //}
 
         addDialogsAction();
     }
@@ -98,7 +98,7 @@ public class MainActivity extends BaseLoggableActivity {
             public void handleMessage(Message msg) {
                 switch (msg.what){
                     case Consts.EXTRA_LOGIN_RESULT_CODE:
-                        performLoginChatSuccessAction(null);
+                        //performLoginChatSuccessAction(null);
                         break;
                     default:
                         super.handleMessage(msg);
@@ -106,6 +106,11 @@ public class MainActivity extends BaseLoggableActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onChatServiceBound() {
+        performLoginChatSuccessAction(null);
     }
 
     private void initFields() {
@@ -122,6 +127,7 @@ public class MainActivity extends BaseLoggableActivity {
         super.onActivityResult(requestCode, resultCode, data);
         facebookHelper.onActivityResult(requestCode, resultCode, data);
         if (SettingsActivity.REQUEST_CODE_LOGOUT == requestCode && RESULT_OK == resultCode) {
+            AndroidChatService.fulllogout(this);
             startLandingScreen();
         }
     }
@@ -242,7 +248,7 @@ public class MainActivity extends BaseLoggableActivity {
     private void launchDialogsListFragment() {
         Log.d("MainActivity", "launchDialogsListFragment()");
         setCurrentFragment(DialogsListFragment.newInstance(),true);
-        AndroidChatService.loadDialogs(this, 1);
+        //AndroidChatService.loadDialogs(this, 1);
     }
 
     private void startImportFriends(){
@@ -263,7 +269,7 @@ public class MainActivity extends BaseLoggableActivity {
         public void execute(Bundle bundle) throws Exception {
             Log.i(TAG, "LoginChatAction");
              if (bundle.getInt(Consts.EXTRA_LOGIN_RESULT) == 1){
-                 performLoginChatSuccessAction(bundle);
+                 //performLoginChatSuccessAction(bundle);
              }
         }
     }

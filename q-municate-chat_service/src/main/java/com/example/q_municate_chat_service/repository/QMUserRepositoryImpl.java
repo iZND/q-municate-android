@@ -145,6 +145,12 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
     }
 
     @Override
+    public void clear() {
+        Log.i(TAG, "clear");
+        dbExecutor.execute( () -> userDao.clear());
+    }
+
+    @Override
     protected void performApiReuqest() {
 
     }

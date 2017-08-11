@@ -9,6 +9,8 @@ import android.arch.lifecycle.ViewModelProvider;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.business.ChatDialogsManager;
+import com.quickblox.q_municate.chat.ChatConnectionProvider;
+import com.quickblox.q_municate.service.AndroidChatService;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -24,10 +26,16 @@ public class QbChatDialogListViewModel extends ViewModel {
     @Inject
     ChatDialogsManager repository;
 
+    ChatConnectionProvider chatConnectionProvider;
+
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
 
     public QbChatDialogListViewModel(){
 
+    }
+
+    public void setChatConnectionProvider(ChatConnectionProvider connectionProvider){
+        chatConnectionProvider = connectionProvider;
     }
 
     private void initContactlist(){
@@ -35,7 +43,8 @@ public class QbChatDialogListViewModel extends ViewModel {
     }
 
     public LiveData<List<QBChatDialog>> getDialogs() {
-        return repository.loadDialogs(1, false);
+        return
+                chatConnectionProvider.loadDialogs(true);
     }
 
     public void removeDialog(final QBChatDialog dialog){

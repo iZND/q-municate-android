@@ -43,4 +43,6 @@ public interface QMUserDao {
     @Query("SELECT * FROM "+TABLE_NAME +" where id in (:userIds)")
     List<QMUser> getByIDs(List<Integer> userIds);
 
+    @Query("DELETE FROM " +TABLE_NAME)
+    void clear();
 }

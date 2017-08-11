@@ -5,12 +5,15 @@ import android.app.Service;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.IInterface;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcel;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -25,12 +28,14 @@ import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.FileHelper;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.business.ChatDialogsManager;
+import com.quickblox.q_municate.chat.ChatConnectionProvider;
 import com.quickblox.q_municate.utils.LiveDataUtils;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -39,7 +44,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.inject.Inject;
 
-public class AndroidChatService extends Service {
+public class AndroidChatService extends Service{
 
     private static final String TAG = AndroidChatService.class.getSimpleName();
     private QBChatService chatService;
@@ -50,10 +55,15 @@ public class AndroidChatService extends Service {
 
     @Inject
     ChatDialogsManager repositoryManager;
+
     private ExecutorService executorService;
 
     private Handler handler = new Handler(Looper.getMainLooper());
     private int pageunmber = 1;
+
+    private IBinder mBinder = new ChatServiceBinder();
+
+
 
     public static void login(Context context, QBUser qbUser, Messenger messenger) {
         Intent intent = new Intent(context, AndroidChatService.class);
@@ -129,7 +139,7 @@ public class AndroidChatService extends Service {
                     () -> startLoginToChat(intent.getBooleanExtra(Consts.EXTRA_FULL_LOGIN, true)));
 
         } else if (currentCommand == Consts.COMMAND_LOGOUT) {
-            executorService.execute( () -> logout());
+            executorService.execute( () -> logout(intent.getBooleanExtra("full", false)));
         } else if (currentCommand == Consts.COMMAND_LOAD_DIALOGS) {
             executorService.execute( () ->loadDialogs(intent));
         }
@@ -197,8 +207,8 @@ public class AndroidChatService extends Service {
 
     }
 
-    public void loadDialogs(Intent intent){
-        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs(pageunmber, true);
+    public LiveData<List<QBChatDialog>> loadDialogs(Intent intent){
+        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs( true);
 
         handler.post( () -> {
             LiveDataUtils.observeValue(listLiveData, (loadedChatDialogs) -> {
@@ -211,10 +221,10 @@ public class AndroidChatService extends Service {
                 if (loadedChatDialogs.size() == 100) {
                     loadDialogs(null);
                 }
-                sendBroadcast(bundle, Consts.EXTRA_LOAD_DIALOGS_ACTION);
+                //sendBroadcast(bundle, Consts.EXTRA_LOAD_DIALOGS_ACTION);
             });
         });
-
+        return listLiveData;
     }
 
     private void startActionsOnSuccessLogin(boolean success) {
@@ -260,12 +270,37 @@ public class AndroidChatService extends Service {
         context.startService(intent);
     }
 
-    private void logout() {
-        destroyRtcClientAndChat();
+    public static void fulllogout(Context context) {
+        Intent intent = new Intent(context, AndroidChatService.class);
+        intent.putExtra(Consts.EXTRA_COMMAND_TO_SERVICE, Consts.COMMAND_LOGOUT);
+        intent.putExtra("full", true);
+        context.startService(intent);
     }
 
-    private void destroyRtcClientAndChat() {
+    private void logout(boolean full) {
+        destroyRtcClientAndChat(full);
+    }
+
+    private void destroyRtcClientAndChat(boolean full) {
         //ChatPingAlarmManager.onDestroy();
+        leaveDialogs();
+        if (chatService != null) {
+            chatService.logout(null);
+        }
+        if (full) {
+            if (chatService != null) {
+                chatService.destroy();
+            }
+            repositoryManager.clearData();
+            stopSelf();
+        }
+        //stopSelf();
+    }
+
+    private void leaveDialogs(){
+        if(CollectionsUtil.isEmpty(chatDialogs)){
+            return;
+        }
         for (QBChatDialog chatDialog : chatDialogs) {
             if (QBDialogType.GROUP == chatDialog.getDialogType()) {
                 try {
@@ -275,11 +310,8 @@ public class AndroidChatService extends Service {
                 }
             }
         }
-        if (chatService != null) {
-            chatService.logout(null);
-        }
-        //stopSelf();
     }
+
 
     @Override
     public void onDestroy() {
@@ -291,7 +323,15 @@ public class AndroidChatService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "Service onBind)");
-        return null;
+        return mBinder;
+    }
+
+    public class ChatServiceBinder extends Binder {
+
+        public ChatConnectionProvider getConnectionProvider() {
+            return AndroidChatService.this.repositoryManager;
+        }
+
     }
 }
 

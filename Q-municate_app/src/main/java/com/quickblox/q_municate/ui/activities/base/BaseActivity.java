@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.activities.base;
 
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -345,7 +346,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onStart() {
         super.onStart();
         Log.d("BaseActivity", "onStart");
-        connectToService();
+        connectToService(QBService.class);
     }
 
     @Override
@@ -456,6 +457,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void unbindService() {
+        unbindService(serviceConnection);
+    }
+
+    protected void unbindService(ServiceConnection serviceConnection, boolean forceUnbind) {
         if (bounded) {
             Log.d("BaseActivity", "unbindService()");
             unbindService(serviceConnection);
@@ -463,10 +468,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    private void connectToService() {
+    protected void connectToService(Class<? extends Service> serviceClass, ServiceConnection serviceConnection) {
         Log.d("BaseActivity", "connectToService()");
-        Intent intent = new Intent(this, QBService.class);
+        Intent intent = new Intent(this, serviceClass);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    protected void connectToService(Class<? extends Service> serviceClass) {
+        connectToService(serviceClass, serviceConnection);
     }
 
     private void registerBroadcastReceivers() {
@@ -669,7 +678,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void loginChat() {
         isDialogLoading = true;
         showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
-        AndroidChatService.lightLogin(this, AppSession.getSession().getUser());
+        AndroidChatService.login(this, AppSession.getSession().getUser(), getMessenger());
         //QBLoginChatCompositeCommand.start(this);
     }
 

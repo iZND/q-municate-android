@@ -17,7 +17,9 @@ public class LiveDataUtils {
             @Override
             public void onChanged(@Nullable T o) {
                 Log.i(TAG, "onChanged value , observer="+observer);
-                observer.onChanged(o);
+                if (observer != null) {
+                    observer.onChanged(o);
+                }
                 liveData.removeObserver(this);
             }
         };
