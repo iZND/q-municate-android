@@ -204,19 +204,31 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             deleteTempMessagesAsync();
         }
 
-        QBChatMessageViewModel.Factory factory = new QBChatMessageViewModel.Factory(currentChatDialog.getDialogId());
-        messagesViewModel =
-                ViewModelProviders.of(this, factory).get(QBChatMessageViewModel.class);
 
-        setupChanges(messagesViewModel);
+    }
+
+    @Override
+    protected void onChatServiceBound() {
+        super.onChatServiceBound();
+        if (messagesViewModel == null) {
+            QBChatMessageViewModel.Factory factory = new QBChatMessageViewModel.Factory(currentChatDialog.getDialogId());
+            messagesViewModel =
+                    ViewModelProviders.of(this, factory).get(QBChatMessageViewModel.class);
+
+            setupChanges(messagesViewModel);
+        }
     }
 
     private void setupChanges(QBChatMessageViewModel messagesViewModel){
-        messagesViewModel.participants.observe(this, (users) -> {
+        messagesViewModel.setChatConnectionProvider(getChatProvider());
+        messagesViewModel.loadDialog(currentChatDialog.getDialogId()).observe(this, (dialog -> {
+            currentChatDialog = dialog;
+        }));
+        messagesViewModel.loadDialogData(currentChatDialog.getDialogId()).observe(this, (users) -> {
             usersInDialog = users;
             updateActionBar();
         } );
-        messagesViewModel.chatMessages.observe(this, (messages) -> {
+        messagesViewModel.loadMessages().observe(this, (messages) -> {
            messagesAdapter.setList(messages, true);
         });
 
@@ -229,9 +241,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (currentChatDialog != null) {
             if (!isTypingNow) {
                 isTypingNow = true;
-                sendTypingStatus();
+                //sendTypingStatus();
             }
-            checkStopTyping();
+            //checkStopTyping();
         }
     }
 
@@ -281,7 +293,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onPause() {
         super.onPause();
         hideSmileLayout();
-        checkStartTyping();
+        //checkStartTyping();
     }
 
     @Override
@@ -651,15 +663,16 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void sendMessage() {
         boolean error = false;
         try {
-            chatHelper.sendChatMessage(messageEditText.getText().toString());
-        } catch (QBResponseException e) {
+            currentChatDialog.sendMessage(messageEditText.getText().toString());
+            //chatHelper.sendChatMessage(messageEditText.getText().toString());
+        }/* catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
             error = true;
         } catch (IllegalStateException e) {
             ErrorUtils.showError(this, this.getString(
                     com.quickblox.q_municate_core.R.string.dlg_not_joined_room));
-            error = true;
-        } catch (Exception e) {
+            error = true;*/
+        catch (Exception e) {
             ErrorUtils.showError(this, e);
             error = true;
         }

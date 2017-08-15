@@ -14,6 +14,6 @@ public interface ChatConnectionProvider {
 
     LiveData<List<QMUser>> loadDialogData(String dlgId);
 
-    LiveData<List<QMUser>> loadDialog(String dlgId);
+    LiveData<QBChatDialog> loadDialog(String dlgId);
 
 }

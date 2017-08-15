@@ -541,6 +541,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return (T) findViewById(viewId);
     }
 
+    public Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.container_fragment);
+    }
+
     public void setCurrentFragment(Fragment fragment) {
         setCurrentFragment(fragment, null);
     }

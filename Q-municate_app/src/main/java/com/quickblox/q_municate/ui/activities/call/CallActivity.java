@@ -464,10 +464,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         closeByWifiStateAllow = false;
     }
 
-    private Fragment getCurrentFragment() {
-        return getSupportFragmentManager().findFragmentById(R.id.container_fragment);
-    }
-
     private void addIncomingCallFragment(QBRTCSessionDescription qbRtcSessionDescription) {
         Log.d(TAG, "QBRTCSession in addIncomingCallFragment is " + qbRtcSessionDescription);
         if (isInFront) {

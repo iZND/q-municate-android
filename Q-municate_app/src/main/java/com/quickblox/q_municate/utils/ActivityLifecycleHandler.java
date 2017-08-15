@@ -34,17 +34,14 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         Log.d(TAG, "onActivityStarted , chatDestroyed=" + chatDestroyed + ", numberOfActivitiesInForeground= "+numberOfActivitiesInForeground);
         if (numberOfActivitiesInForeground == 0 && activityLogeable) {
             AppSession.getSession().updateState(AppSession.ChatState.FOREGROUND);
-            if (chatDestroyed) {
                 boolean isLoggedIn = AppSession.getSession().isLoggedIn();
                 Log.d(TAG, "isSessionExist()" + isLoggedIn);
-                boolean canLogin = chatDestroyed && isLoggedIn;
+                boolean canLogin = isLoggedIn;
                 boolean networkAvailable = ((BaseActivity) activity).isNetworkAvailable();
                 Log.d(TAG, "networkAvailable" + networkAvailable);
                 if (canLogin) {
                     AndroidChatService.lightLogin(activity, AppSession.getSession().getUser());
-                    //QBLoginChatCompositeCommand.start(activity);
                 }
-            }
         }
 
         if (activityLogeable) {
@@ -77,13 +74,10 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         if (numberOfActivitiesInForeground == 0 && activity instanceof Loggable) {
             AppSession.getSession().updateState(AppSession.ChatState.BACKGROUND);
             boolean isLogedIn = isLoggedIn();
-            if (!isLogedIn) {
-                return;
-            }
-            chatDestroyed = ((Loggable) activity).isCanPerformLogoutInOnStop();
-            if (chatDestroyed) {
+            Lo.g("isLogedIn" + isLogedIn);
+            boolean canMakeLogout = ((Loggable) activity).isCanPerformLogoutInOnStop();
+            if (canMakeLogout) {
                 AndroidChatService.logout(activity);
-                //QBLogoutAndDestroyChatCommand.start(activity, true);
             }
         }
     }

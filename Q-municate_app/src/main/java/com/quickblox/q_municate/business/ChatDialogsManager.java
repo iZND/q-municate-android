@@ -20,11 +20,10 @@ import com.example.q_municate_chat_service.repository.QBChatDilogRepositoryImpl;
 import com.example.q_municate_chat_service.repository.QBMessageRepo;
 import com.example.q_municate_chat_service.repository.QMUserRepository;
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.chat.ChatConnectionProvider;
 import com.quickblox.q_municate.utils.LiveDataUtils;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 
 import java.util.ArrayList;
@@ -60,10 +59,8 @@ public class ChatDialogsManager implements ChatConnectionProvider{
             return listLiveData;
         }
         LiveDataUtils.observeValue(listLiveData, (qbChatDialogs) -> {
+            Log.i(TAG, "observeValue dialogs=" + qbChatDialogs);
             ioExecuotr.execute(() -> {
-                for (QBChatDialog qbChatDialog : qbChatDialogs) {
-                    qbChatDialog.join(null, null);
-                }
                 Log.i(TAG, "findunknown users");
                 FinderUnknownUsers finderUnknownUsers =
                         new FinderUnknownUsers(AppSession.getSession().getUser(), qbChatDialogs);
@@ -83,17 +80,11 @@ public class ChatDialogsManager implements ChatConnectionProvider{
                 return userRepository.loadUsersByIds(dialog.getOccupants(), false);
             }
         );
-        /*}) chatDialogRepo.loadById(dlgId, false).flatMap(dialog -> {
-            return userRepository.loadByIds(dialog.getOccupants(), false);
-        }, (dialog, users) -> {
-            Pair<QBChatDialog, List<QMUser>> dialogListPair = new Pair<>(dialog, users);
-            return dialogListPair;
-        });*/
 
     }
 
     @Override
-    public LiveData<List<QMUser>> loadDialog(String dlgId) {
+    public LiveData<QBChatDialog> loadDialog(String dlgId) {
         return null;
     }
 

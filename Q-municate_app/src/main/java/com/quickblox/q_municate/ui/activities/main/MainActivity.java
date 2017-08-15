@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -110,7 +111,13 @@ public class MainActivity extends BaseLoggableActivity {
 
     @Override
     protected void onChatServiceBound() {
-        performLoginChatSuccessAction(null);
+        Log.i(TAG, "onChatServiceBound");
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment == null) {
+            performLoginChatSuccessAction(null);
+        } else{
+            Log.i(TAG, "currentFragment=" +currentFragment);
+        }
     }
 
     private void initFields() {
@@ -187,6 +194,7 @@ public class MainActivity extends BaseLoggableActivity {
 
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
+        Log.d(TAG, "performLoginChatSuccessAction()");
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
         launchDialogsListFragment();
@@ -211,6 +219,7 @@ public class MainActivity extends BaseLoggableActivity {
     private void removeActions() {
         removeAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION);
         removeAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
+        removeAction(Consts.EXTRA_LOGIN_ACTION);
 
         updateBroadcastActionList();
     }
@@ -268,6 +277,9 @@ public class MainActivity extends BaseLoggableActivity {
         @Override
         public void execute(Bundle bundle) throws Exception {
             Log.i(TAG, "LoginChatAction");
+
+
+
              if (bundle.getInt(Consts.EXTRA_LOGIN_RESULT) == 1){
                  //performLoginChatSuccessAction(bundle);
              }

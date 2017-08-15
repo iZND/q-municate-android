@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.example.q_municate_chat_service.entity.user.QMUser;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -44,7 +45,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.inject.Inject;
 
-public class AndroidChatService extends Service{
+public class AndroidChatService extends Service implements ChatConnectionProvider{
 
     private static final String TAG = AndroidChatService.class.getSimpleName();
     private QBChatService chatService;
@@ -59,10 +60,8 @@ public class AndroidChatService extends Service{
     private ExecutorService executorService;
 
     private Handler handler = new Handler(Looper.getMainLooper());
-    private int pageunmber = 1;
 
     private IBinder mBinder = new ChatServiceBinder();
-
 
 
     public static void login(Context context, QBUser qbUser, Messenger messenger) {
@@ -74,8 +73,6 @@ public class AndroidChatService extends Service{
 
         context.startService(intent);
     }
-
-
 
     public static void login(Context context, QBUser qbUser) {
         login(context, qbUser, null);
@@ -172,7 +169,7 @@ public class AndroidChatService extends Service{
             if (fullLogin) {
                 loadContacts();
             } else {
-                //joinDialogs();
+                joinDialogs();
                 sendResultToActivity(true, null);
             }
         } catch (XMPPException|IOException|SmackException|InterruptedException e) {
@@ -184,10 +181,11 @@ public class AndroidChatService extends Service{
     }
 
     private void joinDialogs() {
-        if (chatDialogs == null) {
+        if (CollectionsUtil.isEmpty(chatDialogs)) {
             return;
         }
         for (QBChatDialog chatDialog : chatDialogs) {
+            //chatDialog.initForChat(chatService);
             if (QBDialogType.GROUP == chatDialog.getDialogType()) {
                 chatDialog.join(null, null);
             }
@@ -198,33 +196,22 @@ public class AndroidChatService extends Service{
         handler.post( () ->
             LiveDataUtils.observeValue(App.getInstance().getUserManager().loadUsersFromContactList(),
                 users -> {
-                    //if (!CollectionsUtil.isEmpty(users)){
                         startActionsOnSuccessLogin(true);
-                    /*} else {
-                        Log.d(TAG, "onError load users from contact list" );
-                    }*/
                 }));
 
     }
 
     public LiveData<List<QBChatDialog>> loadDialogs(Intent intent){
-        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs( true);
-
-        handler.post( () -> {
-            LiveDataUtils.observeValue(listLiveData, (loadedChatDialogs) -> {
-                chatDialogs = loadedChatDialogs;
-                for (QBChatDialog qbChatDialog : chatDialogs) {
-                    qbChatDialog.initForChat(chatService);
-                    qbChatDialog.join(null, null);
+        if(!CollectionsUtil.isEmpty(chatDialogs)) {
+            return new LiveData<List<QBChatDialog>>() {
+                @Override
+                protected void onActive() {
+                    super.onActive();
+                    setValue(chatDialogs);
                 }
-                Bundle bundle = new Bundle();
-                if (loadedChatDialogs.size() == 100) {
-                    loadDialogs(null);
-                }
-                //sendBroadcast(bundle, Consts.EXTRA_LOAD_DIALOGS_ACTION);
-            });
-        });
-        return listLiveData;
+            };
+        }
+       return null;
     }
 
     private void startActionsOnSuccessLogin(boolean success) {
@@ -291,6 +278,7 @@ public class AndroidChatService extends Service{
             if (chatService != null) {
                 chatService.destroy();
             }
+            chatDialogs = null;
             repositoryManager.clearData();
             stopSelf();
         }
@@ -326,10 +314,69 @@ public class AndroidChatService extends Service{
         return mBinder;
     }
 
+    @Override
+    public LiveData<List<QBChatDialog>> loadDialogs(boolean forceLoad) {
+        if(!CollectionsUtil.isEmpty(chatDialogs)) {
+            return new LiveData<List<QBChatDialog>>() {
+                @Override
+                protected void onActive() {
+                    super.onActive();
+                    setValue(chatDialogs);
+                }
+            };
+        }
+        else {
+            return loadDialogsFromManager();
+        }
+    }
+
+    private LiveData<List<QBChatDialog>> loadDialogsFromManager() {
+        LiveData<List<QBChatDialog>> listLiveData = repositoryManager.loadDialogs( true);
+
+        handler.post( () -> {
+            LiveDataUtils.observeValue(listLiveData, (loadedChatDialogs) -> {
+                chatDialogs = loadedChatDialogs;
+                Log.i(TAG, "chat user = " +chatService.getUser());
+                if (chatService.getUser() != null) {
+                    for (QBChatDialog qbChatDialog : chatDialogs) {
+                        Log.i(TAG, "ocupants:" + qbChatDialog.getOccupants());
+                        qbChatDialog.initForChat(chatService);
+                        qbChatDialog.join(null, null);
+                    }
+                }
+            });
+        });
+        return listLiveData;
+    }
+
+    @Override
+    public LiveData<List<QMUser>> loadDialogData(String dlgId) {
+        return repositoryManager.loadDialogData(dlgId);
+    }
+
+    @Override
+    public LiveData<QBChatDialog> loadDialog(String dlgId) {
+        if (!CollectionsUtil.isEmpty(chatDialogs)) {
+            return new LiveData<QBChatDialog>() {
+                @Override
+                protected void onActive() {
+                    for (QBChatDialog chatDialog : chatDialogs) {
+                        if (dlgId.equals(chatDialog.getDialogId())) {
+                            setValue(chatDialog);
+                            return;
+                        }
+                    }
+                    setValue(null);
+                }
+            };
+        }
+        return null;
+    }
+
     public class ChatServiceBinder extends Binder {
 
         public ChatConnectionProvider getConnectionProvider() {
-            return AndroidChatService.this.repositoryManager;
+            return AndroidChatService.this;
         }
 
     }
