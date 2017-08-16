@@ -11,13 +11,14 @@ import com.quickblox.q_municate.chat.ChatConnectionProvider;
 import com.quickblox.q_municate.service.AndroidChatService;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.Loggable;
+import com.quickblox.q_municate.utils.bridges.ChatConnectionServiceBridge;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class BaseLoggableActivity extends BaseActivity implements Loggable {
+public abstract class BaseLoggableActivity extends BaseActivity implements Loggable, ChatConnectionServiceBridge {
 
     public AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
@@ -34,6 +35,11 @@ public abstract class BaseLoggableActivity extends BaseActivity implements Logga
     public void onAttachFragment(Fragment fragment) {
         Log.d("BaseLoggableActivity", "onAttachFragment");
         super.onAttachFragment(fragment);
+    }
+
+    @Override
+    public ChatConnectionProvider getChatConnection() {
+        return chatConnectionProvider;
     }
 
     public ChatConnectionProvider getChatProvider(){

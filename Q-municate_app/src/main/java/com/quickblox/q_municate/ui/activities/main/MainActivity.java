@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.activities.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
@@ -93,6 +95,12 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged ="+newConfig);
+    }
+
+    @Override
     protected Messenger getMessenger() {
         return new Messenger(new Handler(){
             @Override
@@ -116,6 +124,7 @@ public class MainActivity extends BaseLoggableActivity {
         if (currentFragment == null) {
             performLoginChatSuccessAction(null);
         } else{
+            ((ServiceConnectionListener)currentFragment).onConnectedToChatService(getChatConnection());
             Log.i(TAG, "currentFragment=" +currentFragment);
         }
     }

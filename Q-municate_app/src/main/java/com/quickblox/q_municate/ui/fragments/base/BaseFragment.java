@@ -11,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.chat.ChatConnectionProvider;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
+import com.quickblox.q_municate.utils.bridges.ChatConnectionServiceBridge;
 import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
 import com.quickblox.q_municate.utils.bridges.LoadingBridge;
 import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
@@ -33,11 +35,14 @@ public abstract class BaseFragment extends LifecycleFragment implements UserStat
     protected ActionBarBridge actionBarBridge;
     protected LoadingBridge loadingBridge;
     protected SnackbarBridge snackbarBridge;
+    protected ChatConnectionServiceBridge chatConnectionBridge;
 
     protected QBFriendListHelper friendListHelper;
     protected QBChatHelper chatHelper;
 
     protected QBService service;
+    protected ChatConnectionProvider chatConnection;
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -66,6 +71,10 @@ public abstract class BaseFragment extends LifecycleFragment implements UserStat
 
         if (activity instanceof SnackbarBridge) {
             snackbarBridge = (SnackbarBridge) activity;
+        }
+
+        if (activity instanceof ChatConnectionServiceBridge) {
+            chatConnectionBridge = (ChatConnectionServiceBridge) activity;
         }
     }
 
@@ -137,5 +146,10 @@ public abstract class BaseFragment extends LifecycleFragment implements UserStat
     @Override
     public void onConnectedToService(QBService service) {
         // nothing by default
+    }
+
+    @Override
+    public void onConnectedToChatService(ChatConnectionProvider chatConnection) {
+        this.chatConnection = chatConnection;
     }
 }

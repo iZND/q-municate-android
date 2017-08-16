@@ -220,7 +220,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void setupChanges(QBChatMessageViewModel messagesViewModel){
-        messagesViewModel.setChatConnectionProvider(getChatProvider());
+        messagesViewModel.setChatConnectionProvider(getChatConnection());
         messagesViewModel.loadDialog(currentChatDialog.getDialogId()).observe(this, (dialog -> {
             currentChatDialog = dialog;
         }));

@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.App;
@@ -30,8 +31,9 @@ public class QbChatDialogListViewModel extends ViewModel {
 
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
 
-    public QbChatDialogListViewModel(){
-
+    public QbChatDialogListViewModel(ChatConnectionProvider connectionProvider){
+        chatConnectionProvider = connectionProvider;
+        loadDialogs();
     }
 
     public void setChatConnectionProvider(ChatConnectionProvider connectionProvider){
@@ -43,8 +45,7 @@ public class QbChatDialogListViewModel extends ViewModel {
     }
 
     public LiveData<List<QBChatDialog>> getDialogs() {
-        return
-                chatConnectionProvider.loadDialogs(true);
+        return dialogs;
     }
 
     public void removeDialog(final QBChatDialog dialog){
@@ -55,11 +56,24 @@ public class QbChatDialogListViewModel extends ViewModel {
 
     }
 
+    private void loadDialogs(){
+        Log.i(TAG, "loadDialogs");
+        if (chatConnectionProvider != null) {
+            dialogs = chatConnectionProvider.loadDialogs(true);
+        }
+    }
+
     public static class Factory extends ViewModelProvider.NewInstanceFactory {
+
+        private ChatConnectionProvider chatConnection;
+
+        public Factory(ChatConnectionProvider chatConnection) {
+            this.chatConnection = chatConnection;
+        }
 
         @Override
         public <T extends ViewModel> T create(Class<T> modelClass) {
-            QbChatDialogListViewModel qbChatDialogListViewModel = new QbChatDialogListViewModel();
+            QbChatDialogListViewModel qbChatDialogListViewModel = new QbChatDialogListViewModel(chatConnection);
             App.getInstance().getComponent().inject(qbChatDialogListViewModel);
             return (T) qbChatDialogListViewModel;
         }

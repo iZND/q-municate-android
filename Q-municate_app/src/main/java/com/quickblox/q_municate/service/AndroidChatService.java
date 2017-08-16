@@ -62,6 +62,7 @@ public class AndroidChatService extends Service implements ChatConnectionProvide
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private IBinder mBinder = new ChatServiceBinder();
+    private ChatConnection chatConnection;
 
 
     public static void login(Context context, QBUser qbUser, Messenger messenger) {
@@ -165,6 +166,8 @@ public class AndroidChatService extends Service implements ChatConnectionProvide
     private void loginToChat(QBUser qbUser, boolean fullLogin) {
         try {
             chatService.login(qbUser);
+            chatConnection = new ChatConnection(chatService);
+            chatConnection.start();
             Thread.sleep(2000);
             if (fullLogin) {
                 loadContacts();
@@ -185,7 +188,7 @@ public class AndroidChatService extends Service implements ChatConnectionProvide
             return;
         }
         for (QBChatDialog chatDialog : chatDialogs) {
-            //chatDialog.initForChat(chatService);
+            chatDialog.initForChat(chatService);
             if (QBDialogType.GROUP == chatDialog.getDialogType()) {
                 chatDialog.join(null, null);
             }
@@ -316,6 +319,7 @@ public class AndroidChatService extends Service implements ChatConnectionProvide
 
     @Override
     public LiveData<List<QBChatDialog>> loadDialogs(boolean forceLoad) {
+        Log.d(TAG, "loading Dialogs");
         if(!CollectionsUtil.isEmpty(chatDialogs)) {
             return new LiveData<List<QBChatDialog>>() {
                 @Override

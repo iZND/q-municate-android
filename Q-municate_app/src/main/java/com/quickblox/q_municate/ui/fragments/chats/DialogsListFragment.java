@@ -26,6 +26,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.chat.ChatConnectionProvider;
 import com.quickblox.q_municate.loaders.DialogsListLoader;
 import com.quickblox.q_municate.service.Consts;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -117,7 +118,6 @@ public class DialogsListFragment extends BaseFragment {
         Log.d(TAG, "onCreate");
         initFields();
         initChatsDialogs();
-        addActions();
         addObservers();
     }
 
@@ -212,27 +212,39 @@ public class DialogsListFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
+        addActions();
+        if (chatConnectionBridge.getChatConnection() != null && qbChatDialogListViewModel == null) {
+            initViewModel();
+        }
+    }
 
-        QbChatDialogListViewModel.Factory factory = new QbChatDialogListViewModel.Factory();
+    @Override
+    public void onConnectedToChatService(ChatConnectionProvider chatConnection) {
+        super.onConnectedToChatService(chatConnection);
+        if (qbChatDialogListViewModel == null) {
+            initViewModel();
+        }
+    }
+
+    private void initViewModel(){
+        Log.i(TAG, "initViewModel with" + (chatConnectionBridge.getChatConnection() != null? "connection" : "null"));
+        QbChatDialogListViewModel.Factory factory = new QbChatDialogListViewModel.Factory(chatConnectionBridge.getChatConnection());
         qbChatDialogListViewModel =
                 ViewModelProviders.of(this, factory).get(QbChatDialogListViewModel.class);
+        Log.i(TAG, "initViewModel "+ qbChatDialogListViewModel.chatConnectionProvider);
 
         setupChanges(qbChatDialogListViewModel);
-
     }
 
     private void setupChanges(QbChatDialogListViewModel chatDialogListViewModel){
-        chatDialogListViewModel.setChatConnectionProvider(((BaseLoggableActivity)getActivity()).getChatProvider());
-        chatDialogListViewModel.getDialogs().observe(this, new android.arch.lifecycle.Observer<List<QBChatDialog>>() {
-            @Override
-            public void onChanged(@Nullable List<QBChatDialog> qbChatDialogs) {
+        Log.i(TAG, "setupChanges");
+        chatDialogListViewModel.getDialogs().observe(this, (qbChatDialogs) -> {
                 Log.i(TAG, "onChanged live data");
                 dialogsListAdapter.setNewData(qbChatDialogs);
                 checkEmptyList(dialogsListAdapter.getCount());
                 baseActivity.hideProgress();
                 baseActivity.hideSnackBar(R.string.dialog_loading_dialogs);
-            }
-        });
+            });
     }
 
 
