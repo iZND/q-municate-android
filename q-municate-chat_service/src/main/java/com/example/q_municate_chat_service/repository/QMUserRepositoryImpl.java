@@ -1,8 +1,10 @@
 package com.example.q_municate_chat_service.repository;
 
 
+import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +18,8 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.core.request.QBPagedRequestBuilder;
+import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.core.server.Performer;
 import com.quickblox.extensions.RxJavaPerformProcessor;
 import com.quickblox.users.QBUsers;
@@ -60,18 +64,19 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
         Log.i(TAG, "loadAll "+usersIds);
         this.usersIds = usersIds;
         final LiveData<List<QMUser>> dbSource = userDao.getUsersByIDs(usersIds);
-        if (!forceload) {
-            return dbSource;
-        }
         result.addSource(dbSource,(users) -> {
                 Log.i(TAG, "onChanged from db source");
                 if (shouldFetch(users)) {
                     Log.i(TAG, "users shouldFetch");
                     result.removeSource(dbSource);
                     fetchFromNetwork(dbSource);
-                } else {
+                } else if (isDataSetFull(usersIds, users)){
                     Log.i(TAG, "return users from db");
                     result.setValue(users);
+                } else {
+                    this.usersIds = fillNotFoundUsersList(usersIds, users);
+                    Log.i(TAG, "users not found in cache " +usersIds);
+                    loadNotCachedUsers(usersIds, users);
                 }
             });
         return result;
@@ -82,13 +87,36 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
         if (!forceload) {
             return userDao.getUsersByIDs(usersIds);
         } else {
-            return null;/*RxUtils.makeObservable(QBUsers.getUsersByIDs(usersIds, null))
-                    .switchMap((qbUsers) -> {
-                            List<QMUser> users = QMUser.convertList(qbUsers);
-                            return Observable.just(users);
-                        })*/
+            return null;
 
         }
+    }
+
+    private void loadNotCachedUsers(List<Integer> usersIds, List<QMUser> cachedUsers){
+        this.usersIds = fillNotFoundUsersList(usersIds, cachedUsers);
+        final LiveData<List<QMUser>> apiSource = createApiData();
+        result.addSource(apiSource, (loadedUsers) -> {
+            Log.i(TAG, "onChanged from api request");
+            if (!CollectionsUtil.isEmpty(loadedUsers)) {
+                dbExecutor.execute( () -> {
+                        Log.i(TAG, "chatDialogDao.insertAll");
+                        userDao.insertAll(loadedUsers);
+                    });
+                cachedUsers.addAll(loadedUsers);
+            }
+            result.setValue(cachedUsers);
+        });
+    }
+
+    private List<Integer> fillNotFoundUsersList(List<Integer> usersIds, List<QMUser> users){
+        for (QMUser user : users) {
+            usersIds.remove(user.getId());
+        }
+        return usersIds;
+    }
+
+    private boolean isDataSetFull(List<Integer> usersIds, List<QMUser> users){
+        return users.size() == usersIds.size();
     }
 
     private void fetchFromNetwork(LiveData<List<QMUser>> dbSource) {
@@ -116,7 +144,9 @@ public class QMUserRepositoryImpl extends BaseRepoImpl<QMUser> implements QMUser
         return new LiveData<List<QMUser>>() {
             @Override
             protected void onActive() {
-                QBUsers.getUsersByIDs(usersIds, null).
+                QBPagedRequestBuilder requestGetBuilder = new QBPagedRequestBuilder();
+                requestGetBuilder.setPerPage(100);
+                QBUsers.getUsersByIDs(usersIds, requestGetBuilder).
                         performAsync(new QBEntityCallback<ArrayList<QBUser>>() {
                             @Override
                             public void onSuccess(ArrayList<QBUser> users, Bundle bundle) {

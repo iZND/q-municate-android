@@ -1,7 +1,6 @@
 package com.example.q_municate_chat_service.repository;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,22 +9,16 @@ import android.util.Log;
 
 import com.example.q_municate_chat_service.dao.QBChatDialogDao;
 import com.example.q_municate_chat_service.entity.PagedResult;
-import com.example.q_municate_chat_service.util.RxUtils;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
-import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.extensions.RxJavaPerformProcessor;
-import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Completable;
-import rx.Observable;
-import rx.functions.Func0;
 
 public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implements QBChatDialogRepository{
 
@@ -40,6 +33,7 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implem
 
     @Override
     public Completable create(QBChatDialog dialog) {
+        dbExecutor.execute( () -> chatDialogDao.insert(dialog));
         return null;
     }
 
@@ -141,7 +135,9 @@ public class QBChatDilogRepositoryImpl extends BaseRepoImpl<QBChatDialog> implem
     }
 
     @Override
-    public Completable update(QBChatDialog event) {
+    public Completable update(QBChatDialog dialog) {
+        Log.i(TAG, "updated dlg="+dialog);
+        dbExecutor.execute( () -> chatDialogDao.update(dialog));
         return null;
     }
 

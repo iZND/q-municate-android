@@ -221,15 +221,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void setupChanges(QBChatMessageViewModel messagesViewModel){
         messagesViewModel.setChatConnectionProvider(getChatConnection());
-        messagesViewModel.loadDialog(currentChatDialog.getDialogId()).observe(this, (dialog -> {
+        String dialogId = currentChatDialog.getDialogId();
+        messagesViewModel.loadDialog(dialogId).observe(this, (dialog -> {
+            Log.i(TAG, "loadDialog observer" +dialog);
             currentChatDialog = dialog;
         }));
-        messagesViewModel.loadDialogData(currentChatDialog.getDialogId()).observe(this, (users) -> {
+
+        messagesViewModel.loadDialogData(dialogId).observe(this, (users) -> {
+            Log.i(TAG, "loadDialogData observer" +users);
             usersInDialog = users;
             updateActionBar();
         } );
         messagesViewModel.loadMessages().observe(this, (messages) -> {
-           messagesAdapter.setList(messages, true);
+            messagesAdapter.setList(messages, true);
         });
 
     }
@@ -663,7 +667,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void sendMessage() {
         boolean error = false;
         try {
-            currentChatDialog.sendMessage(messageEditText.getText().toString());
+            QBMessage message = new QBMessage();
+            message.setBody(messageEditText.getText().toString());
+            chatConnectionProvider.sendMessage(currentChatDialog, message);
             //chatHelper.sendChatMessage(messageEditText.getText().toString());
         }/* catch (QBResponseException e) {
             ErrorUtils.showError(this, e);

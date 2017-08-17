@@ -5,6 +5,7 @@ import android.arch.persistence.room.TypeConverter;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.StringifyArrayList;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
@@ -59,7 +60,7 @@ public class DateConverter {
     @TypeConverter
     public static String listToArray(List<Integer> integerList) {
 
-        String listString = TextUtils.join(", ", integerList);
+        String listString = CollectionsUtil.isEmpty(integerList) ? "" : TextUtils.join(", ", integerList);
         return listString;
     }
 

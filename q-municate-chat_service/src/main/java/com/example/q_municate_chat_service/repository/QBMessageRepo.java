@@ -36,8 +36,8 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
     }
 
     @Override
-    public void create(QBMessage event) {
-
+    public void create(QBMessage message) {
+        dbExecutor.execute( () -> messageDao.insert(message));
     }
 
     @Override
@@ -47,39 +47,18 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
 
     public LiveData<List<QBMessage>> loadAll(String dialogId, boolean forceLoad) {
         Log.i(TAG, "loadAll dialogId="+dialogId);
-        /*if (!forceLoad) {
-            return RxUtils.makeObservable( new ArrayList<>(messageDao.getAllByDialog(dialogId)));
-        } else {
-            QBChatDialog chatDialog = new QBChatDialog(dialogId);
-            return RxUtils.makeObservable(QBRestChatService.
-                    getDialogMessages(chatDialog, null))
-                    .switchMap( (qbChatMessages) -> {
-                                       ArrayList<QBMessage> messages = parseMessage(qbChatMessages);
-                                       return Observable.just(messages);
-                                   });
-
-        }*/
         this.dialogId = dialogId;
         final LiveData<List<QBMessage>> dbSource = messageDao.getAllByDialog(dialogId);
-        if (!forceLoad) {
-            Log.i(TAG, "return result from db");
-            return dbSource;
-        }
-        result.addSource(dbSource, new Observer<List<QBMessage>>() {
-            @Override
-            public void onChanged(@Nullable List<QBMessage> data) {
+        result.addSource(dbSource, (messages) -> {
                 Log.i(TAG, "onChanged from db source");
-
-
-                if (shouldFetch(data)) {
+                if (shouldFetch(messages)) {
                     result.removeSource(dbSource);
                     Log.i(TAG, "onChanged from db source :shouldFetch");
                     fetchFromNetwork(dbSource);
                 } else {
-                    result.setValue(data);
+                    result.setValue(messages);
                 }
-            }
-        });
+            });
         return result;
     }
 

@@ -33,7 +33,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 
-public class ChatDialogsManager implements ChatConnectionProvider{
+public class ChatDialogsManager{
 
     private static final String TAG = ChatDialogsManager.class.getSimpleName();
     private QBChatDilogRepositoryImpl chatDialogRepo;
@@ -76,14 +76,14 @@ public class ChatDialogsManager implements ChatConnectionProvider{
 
     public LiveData<List<QMUser>> loadDialogData(String dlgId){
         return Transformations.switchMap(chatDialogRepo.loadById(dlgId, false),
-                 (dialog) -> {
+                (dialog) -> {
+                Log.i(TAG, "udapted dialog =" +dialog);
                 return userRepository.loadUsersByIds(dialog.getOccupants(), false);
             }
         );
 
     }
 
-    @Override
     public LiveData<QBChatDialog> loadDialog(String dlgId) {
         return null;
     }
@@ -103,5 +103,17 @@ public class ChatDialogsManager implements ChatConnectionProvider{
     public void clearData() {
         chatDialogRepo.clear();
         userRepository.clear();
+    }
+
+    public void saveMessage(QBMessage message) {
+        messageRepo.create(message);
+    }
+
+    public void saveDialog(QBChatDialog chatDialog) {
+        chatDialogRepo.create(chatDialog);
+    }
+
+    public void updateDialog(QBChatDialog chatDialog) {
+        chatDialogRepo.update(chatDialog);
     }
 }

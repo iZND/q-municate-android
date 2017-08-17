@@ -6,6 +6,7 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 
 import com.quickblox.chat.model.QBChatDialog;
@@ -26,6 +27,12 @@ public interface QBChatDialogDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<QBChatDialog> repositories);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(QBChatDialog dialog);
+
+    @Update
+    void update(QBChatDialog dialog);
 
     @Delete
     void delete(QBChatDialog dialogModel);

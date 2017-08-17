@@ -28,8 +28,11 @@ public interface QBMessageDao {
     LiveData<QBMessage> getById(int msgId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<QBMessage> repositories);
+    void insertAll(List<QBMessage> messages);
+
+    @Insert
+    void insert(QBMessage message);
 
     @Delete
-    void delete(QBMessage contactItem);
+    void delete(QBMessage message);
 }
