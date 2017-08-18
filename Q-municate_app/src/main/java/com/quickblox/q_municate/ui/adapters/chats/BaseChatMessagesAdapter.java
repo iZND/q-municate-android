@@ -15,10 +15,14 @@ import com.bumptech.glide.request.target.Target;
 import com.example.q_municate_chat_service.entity.QBMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.chat.ChatConnectionProvider;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
+import com.quickblox.q_municate.utils.chat.ChatMessageUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
@@ -48,6 +52,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<QBMessage> implem
 
     private DataManager dataManager;
     protected QBChatDialog chatDialog;
+    protected ChatConnectionProvider chatConnectionProvider;
 
     BaseChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog dialog, List<QBMessage> chatMessages) {
         super(baseActivity.getBaseContext(), chatMessages);
@@ -56,6 +61,10 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<QBMessage> implem
         currentUser = AppSession.getSession().getUser();
         fileUtils = new FileUtils();
         dataManager = DataManager.getInstance();
+    }
+
+    public void attachConnectionProvider(ChatConnectionProvider chatConnectionProvider){
+        this.chatConnectionProvider = chatConnectionProvider;
     }
 
     @Override
@@ -136,13 +145,9 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<QBMessage> implem
     }
 
     protected void updateMessageState(QBMessage message, QBChatDialog dialog) {
-        /*if (!State.READ.equals(message.getState()) && baseActivity.isNetworkAvailable()) {
-            message.setState(State.READ);
-            Log.d(TAG, "updateMessageState");
-
-            message.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, dialog, message, true);
-        }*/
+        if (!message.isReadForOwner()) {
+            chatConnectionProvider.markMessageRead(message, dialog);
+        }
     }
 
     @Override
@@ -161,11 +166,15 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<QBMessage> implem
         notifyItemRangeInserted(chatMessages.size() - collection.size(), chatMessages.size());
     }
 
-    public void setList(List<QBMessage> collection, boolean notifyDataChanged){
+    public void setList(List<QBMessage> collection,boolean notifyDataChanged){
         chatMessages = collection;
         if (notifyDataChanged) {
             this.notifyDataSetChanged();
         }
+    }
+
+    public void setDialog(QBChatDialog currentChatDialog) {
+        this.chatDialog = currentChatDialog;
     }
 
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {

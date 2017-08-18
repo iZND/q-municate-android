@@ -44,7 +44,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
         }
-
+        updateMessageState(chatMessage, chatDialog);
         /*if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
             updateMessageState(chatMessage, chatDialogData);
         }*/

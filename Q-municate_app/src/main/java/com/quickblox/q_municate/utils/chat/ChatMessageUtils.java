@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.example.q_municate_chat_service.entity.GroupNotification;
 import com.example.q_municate_chat_service.entity.QBMessage;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -87,5 +88,14 @@ public class ChatMessageUtils {
 
         return resultMessage;
 
+    }
+
+    public static boolean isReadForMe(QBMessage message){
+        boolean isRead = false;
+        if (!CollectionsUtil.isEmpty(message.getReadIds())){
+            isRead = message.getReadIds().contains
+                    (AppSession.getSession().getUser().getId());
+        }
+        return isRead;
     }
 }

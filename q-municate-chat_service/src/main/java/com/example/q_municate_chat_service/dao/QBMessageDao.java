@@ -7,6 +7,7 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.example.q_municate_chat_service.entity.QBMessage;
 
@@ -35,4 +36,7 @@ public interface QBMessageDao {
 
     @Delete
     void delete(QBMessage message);
+
+    @Update
+    void update(QBMessage message);
 }

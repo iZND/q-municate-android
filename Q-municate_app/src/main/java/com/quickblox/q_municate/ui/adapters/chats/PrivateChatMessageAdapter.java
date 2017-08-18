@@ -77,6 +77,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
             timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()*SECOND_IN_MILLIS));
         }
 
+        updateMessageState(chatMessage, chatDialog);
         /*if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
             updateMessageState(chatMessage, chatDialogData);
         }*/

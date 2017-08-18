@@ -37,8 +37,6 @@ public class QBChatMessageViewModel extends ViewModel {
     private Executor ioExecuotr = Executors.newSingleThreadExecutor();
     private String dlgId;
     private ChatConnectionProvider chatConnectionProvider;
-    ;
-
 
     public QBChatMessageViewModel(String dlgId){
         this.dlgId = dlgId;

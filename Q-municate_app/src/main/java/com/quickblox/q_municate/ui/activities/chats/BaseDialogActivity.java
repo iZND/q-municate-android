@@ -38,6 +38,7 @@ import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.viewmodel.QBChatMessageViewModel;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
+import com.quickblox.q_municate.utils.LiveDataUtils;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
@@ -211,6 +212,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onChatServiceBound() {
         super.onChatServiceBound();
         if (messagesViewModel == null) {
+            messagesAdapter.attachConnectionProvider(getChatConnection());
             QBChatMessageViewModel.Factory factory = new QBChatMessageViewModel.Factory(currentChatDialog.getDialogId());
             messagesViewModel =
                     ViewModelProviders.of(this, factory).get(QBChatMessageViewModel.class);
@@ -225,15 +227,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesViewModel.loadDialog(dialogId).observe(this, (dialog -> {
             Log.i(TAG, "loadDialog observer" +dialog);
             currentChatDialog = dialog;
+            messagesAdapter.setDialog(currentChatDialog);
         }));
 
-        messagesViewModel.loadDialogData(dialogId).observe(this, (users) -> {
+
+        LiveDataUtils.observeValue(messagesViewModel.loadDialogData(dialogId), (users) -> {
             Log.i(TAG, "loadDialogData observer" +users);
             usersInDialog = users;
             updateActionBar();
+
         } );
         messagesViewModel.loadMessages().observe(this, (messages) -> {
-            messagesAdapter.setList(messages, true);
+            messagesAdapter.setList(messages,  true);
         });
 
     }

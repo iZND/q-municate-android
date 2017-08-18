@@ -116,4 +116,8 @@ public class ChatDialogsManager{
     public void updateDialog(QBChatDialog chatDialog) {
         chatDialogRepo.update(chatDialog);
     }
+
+    public void updateMessage(QBMessage message) {
+        messageRepo.update(message);
+    }
 }

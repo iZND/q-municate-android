@@ -9,19 +9,26 @@ import android.util.Log;
 
 import com.example.q_municate_chat_service.dao.QBMessageDao;
 import com.example.q_municate_chat_service.entity.QBMessage;
+import com.example.q_municate_chat_service.util.MessageUtils;
 import com.example.q_municate_chat_service.util.RxUtils;
+import com.quickblox.chat.Consts;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.request.QBMessageGetBuilder;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
+
+import static com.example.q_municate_chat_service.util.Consts.PAGE_LIMIT;
 
 
 public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<QBMessage, String>{
@@ -67,6 +74,10 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
         return null;
     }
 
+    public void update(QBMessage message) {
+        dbExecutor.execute( () -> messageDao.update(message));
+    }
+
     @Override
     public void delete(QBMessage event) {
 
@@ -75,7 +86,25 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
     @Override
     protected void performApiReuqest() {
         QBChatDialog chatDialog = new QBChatDialog(dialogId);
-        QBRestChatService.getDialogMessages(chatDialog, null).performAsync(new QBEntityCallback<ArrayList<QBChatMessage>>() {
+
+        QBMessageGetBuilder messageGetBuilder = new QBMessageGetBuilder();
+        messageGetBuilder.setLimit(PAGE_LIMIT);
+
+        /*if (isLoadOldMessages) {
+            messageGetBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            messageGetBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
+        } else {
+            messageGetBuilder.gt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            if (lastDateLoad > 0) {
+                messageGetBuilder.sortAsc(QBServiceConsts.EXTRA_DATE_SENT);
+            } else {
+                messageGetBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
+            }
+        }*/
+
+        messageGetBuilder.markAsRead(false);
+
+        QBRestChatService.getDialogMessages(chatDialog, messageGetBuilder).performAsync(new QBEntityCallback<ArrayList<QBChatMessage>>() {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> qbChatMessages, Bundle bundle) {
                 result.setValue(parseMessage(qbChatMessages));
@@ -89,9 +118,12 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
     }
 
     private ArrayList<QBMessage> parseMessage(ArrayList<QBChatMessage> qbChatMessages){
+        QBUser user = QBChatService.getInstance().getUser();
         ArrayList<QBMessage> messages = new ArrayList<>(qbChatMessages.size());
         for (QBChatMessage qbChatMessage : qbChatMessages) {
-            messages.add(new QBMessage(qbChatMessage));
+            QBMessage message = new QBMessage(qbChatMessage);
+            message.setReadForOwner(MessageUtils.isReadForMe(message, user.getId()));
+            messages.add(message);
         }
         return messages;
     }
@@ -116,4 +148,6 @@ public class QBMessageRepo extends BaseRepoImpl<QBMessage> implements BaseRepo<Q
             }
         });
     }
+
+
 }

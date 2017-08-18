@@ -6,6 +6,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.core.helper.CollectionsUtil;
 
 import java.util.Map;
 
@@ -19,6 +20,8 @@ public class QBMessage extends QBChatMessage {
 
     @Ignore
     private NotificationType notificationType;
+
+    boolean isReadForOwner;
 
     public QBMessage(QBChatMessage chatMessage){
         setBody(chatMessage.getBody());
@@ -49,5 +52,12 @@ public class QBMessage extends QBChatMessage {
         this.notificationType = notificationType;
     }
 
+    public boolean isReadForOwner() {
+        return isReadForOwner;
+    }
+
+    public void setReadForOwner(boolean readForOwner) {
+        isReadForOwner = readForOwner;
+    }
 
 }

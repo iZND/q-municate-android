@@ -257,6 +257,7 @@ public class AndroidChatService extends Service{
             if (chatService != null) {
                 chatService.destroy();
             }
+            chatConnection.destroy();
             chatDialogs = null;
             repositoryManager.clearData();
             stopSelf();

@@ -21,4 +21,5 @@ public interface ChatConnectionProvider {
 
     void sendMessage(QBChatDialog chatDialog, QBMessage message) throws SmackException.NotConnectedException;
 
+    void markMessageRead(QBMessage message, QBChatDialog dialog);
 }
